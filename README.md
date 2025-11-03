@@ -20,7 +20,7 @@ Use it when you need a *repeatable shuffle*, *non-cryptographic obfuscation*, or
 ### 🚀 Example
 
 ```kotlin
-import io.github.yourhandle.kpermute.*
+import io.github.rasros.kpermute.*
 
 fun main() {
     val perm = IntPermutation(size = 1000)
