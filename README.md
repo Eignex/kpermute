@@ -27,7 +27,7 @@ Use it when you need a *repeatable shuffle*, *non-cryptographic obfuscation*, or
 ### 🚀 Example
 
 ```kotlin
-import io.github.rasros.kpermute.*
+import com.eigenity.kpermute.*
 
 fun main() {
 
