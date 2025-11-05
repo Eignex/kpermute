@@ -79,4 +79,14 @@ publishing {
     }
 }
 
-signing { sign(publishing.publications["mavenJava"]) }
+signing {
+    val key = findProperty("signingKey") as String?
+    val pass = findProperty("signingPassword") as String?
+
+    if (key != null && pass != null) {
+        useInMemoryPgpKeys(key, pass)
+        sign(publishing.publications["mavenJava"])
+    } else {
+        logger.lifecycle("Signing disabled: signingKey or signingPassword not defined.")
+    }
+}
