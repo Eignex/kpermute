@@ -46,3 +46,46 @@ interface IntPermutation : Iterable<Int> {
      */
     fun iterator(offset: Int): IntIterator
 }
+
+/**
+ * Returns a new list whose elements are permuted by [perm].
+ * The original list is not modified.
+ *
+ * Example:
+ * ```
+ * val perm = intPermutation(5, seed = 42)
+ * val shuffled = listOf("a","b","c","d","e").permutedBy(perm)
+ * ```
+ */
+fun <T> List<T>.permutedBy(perm: IntPermutation): List<T> {
+    val n = size
+    require(perm.size >= 0 && perm.size == n) {
+        "Permutation domain (${perm.size}) must equal list size ($n)"
+    }
+    return List(n) { index -> this[perm.decode(index)] }
+}
+
+/**
+ * Applies the inverse of [perm] to reorder this list back to original order.
+ */
+fun <T> List<T>.unpermutedBy(perm: IntPermutation): List<T> {
+    val n = size
+    require(perm.size >= 0 && perm.size == n) {
+        "Permutation domain (${perm.size}) must equal list size ($n)"
+    }
+    return List(n) { index -> this[perm.encode(index)] }
+}
+
+/**
+ * Returns a new list whose elements are permuted by a permutation initialized
+ * by [rng] and [rounds].
+ * The original list is not modified.
+ *
+ * Example:
+ * ```
+ * val perm = intPermutation(5, seed = 42)
+ * val shuffled = listOf("a","b","c","d","e").permutedBy(perm)
+ * ```
+ */
+fun <T> List<T>.permute(rng: Random, rounds: Int = 0) =
+    permutedBy(intPermutation(size, rng, rounds))
