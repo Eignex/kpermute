@@ -4,7 +4,10 @@ internal object PermMathInt {
     /** k = min s.t. 2^k >= size (size in 1..2^31), mask = (2^k - 1), rshift ~= k*3/7 */
     fun block(sizeExclusive: Int): Triple<Int /*mask*/, Int /*kBits*/, Int /*rshift*/> {
         require(sizeExclusive > 0)
-        val k = if (sizeExclusive <= 1) 1 else 32 - Integer.numberOfLeadingZeros(sizeExclusive - 1)
+        val k =
+            if (sizeExclusive <= 1) 1 else 32 - Integer.numberOfLeadingZeros(
+                sizeExclusive - 1
+            )
         val mask = -1 ushr (32 - k)            // avoids 1 shl 31 overflow
         val rshift = (k * 3) / 7
         return Triple(mask, k, rshift)
