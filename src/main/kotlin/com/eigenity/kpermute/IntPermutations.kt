@@ -108,6 +108,7 @@ fun <T> List<T>.unpermutedBy(perm: IntPermutation): List<T> {
  * val shuffled = listOf("a","b","c","d","e").permutedBy(perm)
  * ```
  */
+@JvmOverloads
 fun <T> List<T>.permuted(rng: Random = Random.Default, rounds: Int = 0) =
     permutedBy(intPermutation(size, rng, rounds))
 
