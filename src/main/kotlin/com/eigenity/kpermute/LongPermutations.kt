@@ -1,7 +1,7 @@
 package com.eigenity.kpermute
 
 /**
- * Represents a reversible integer permutation over a finite or full 32-bit domain.
+ * Represents a reversible integer permutation over a finite or full 64-bit domain.
  *
  * Implementations provide deterministic bijections for integer sets, allowing
  * repeatable shuffling, masking, or indexing without storing lookup tables.
@@ -13,32 +13,32 @@ package com.eigenity.kpermute
  *
  * ## Domain semantics
  * - For finite domains, `size` defines the valid range `[0, size)`.
- * - A `size` of `-1` represents the full signed 32-bit integer space.
+ * - A `size` of `-1L` represents the full signed 64-bit integer space.
  * - `encodeUnchecked`/`decodeUnchecked` skip bounds checks for performance;
- *   callers must ensure arguments are within the domain when `size >= 0`.
+ *   callers must ensure arguments are within the domain when `size >= 0L`.
  *
  * Implementations are iterable and yield `encode(i)` for all valid `i`.
  *
- * Use the factory method [intPermutation] for instantiation.
+ * Use the factory method [longPermutation] for instantiation.
  */
-interface IntPermutation : Iterable<Int> {
+interface LongPermutation : Iterable<Long> {
 
     /**
      * Domain of the permutation.
      */
-    val size: Int
+    val size: Long
 
 
     /** Fast path. No range checks. Precondition: if size >= 0 then arg ∈ [0, size). */
-    fun encodeUnchecked(value: Int): Int
+    fun encodeUnchecked(value: Long): Long
 
     /** Fast path. No range checks. Precondition: if size >= 0 then arg ∈ [0, size). */
-    fun decodeUnchecked(encoded: Int): Int
+    fun decodeUnchecked(encoded: Long): Long
 
     /**
      * Encode an integer in [0, [size]) into its permuted value.
      */
-    fun encode(value: Int): Int {
+    fun encode(value: Long): Long {
         if (size >= 0) require(value in 0 until size) {
             "value $value out of range [0, $size)"
         }
@@ -48,7 +48,7 @@ interface IntPermutation : Iterable<Int> {
     /**
      *  Decode a previously encoded integer back to its original value.
      */
-    fun decode(encoded: Int): Int {
+    fun decode(encoded: Long): Long {
         if (size >= 0) require(encoded in 0 until size) {
             "encoded $encoded out of range [0, $size)"
         }
@@ -58,47 +58,12 @@ interface IntPermutation : Iterable<Int> {
     /**
      * Iterator that yields encoded values for [0, size).
      */
-    override fun iterator(): IntIterator = iterator(0)
+    override fun iterator(): LongIterator = iterator(0)
 
     /**
      * Iterator that yields encoded values for [offset, size).
      */
-    fun iterator(offset: Int): IntIterator
-}
-
-/**
- * Returns a new list whose elements are permuted by [perm].
- * The original list is not modified.
- *
- * Example:
- * ```
- * val perm = intPermutation(5, seed = 42)
- * val shuffled = listOf("a","b","c","d","e").permuted(perm)
- * ```
- */
-fun <T> List<T>.permuted(perm: IntPermutation = intPermutation(size)): List<T> {
-    val n = size
-    require(perm.size == n) {
-        "Permutation domain (${perm.size}) must equal list size ($n)"
-    }
-    return object : AbstractList<T>() {
-        override val size: Int get() = n
-        override fun get(index: Int): T = this@permuted[perm.decode(index)]
-    }
-}
-
-/**
- * Applies the inverse of [perm] as a view, restoring the original order.
- */
-fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
-    val n = size
-    require(perm.size == n) {
-        "Permutation domain (${perm.size}) must equal list size ($n)"
-    }
-    return object : AbstractList<T>() {
-        override val size: Int get() = n
-        override fun get(index: Int): T = this@unpermuted[perm.encode(index)]
-    }
+    fun iterator(offset: Long): LongIterator
 }
 
 /**
@@ -108,41 +73,41 @@ fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
  * Useful for permuting values within numeric subranges such as dataset shards,
  * sliding windows, or bounded ID segments without manual offset math.
  */
-fun IntPermutation.range(range: IntRange): IntPermutation {
-    val n = range.last - range.first + 1
-    require(size >= 0) { "range() requires a finite base permutation" }
+fun LongPermutation.range(range: LongRange): LongPermutation {
+    val n = range.last - range.first + 1L
+    require(size >= 0L) { "range() requires a finite base permutation" }
     require(size == n) { "base size ($size) must equal range length ($n)" }
 
     val start = range.first
-    return object : IntPermutation {
-        override val size: Int = n
+    return object : LongPermutation {
+        override val size: Long = n
 
         // Unchecked operate on *range values*.
-        override fun encodeUnchecked(value: Int): Int =
+        override fun encodeUnchecked(value: Long): Long =
             start + this@range.encodeUnchecked(value - start)
 
-        override fun decodeUnchecked(encoded: Int): Int =
+        override fun decodeUnchecked(encoded: Long): Long =
             start + this@range.decodeUnchecked(encoded - start)
 
         // Checked wrappers validate range membership.
-        override fun encode(value: Int): Int {
+        override fun encode(value: Long): Long {
             require(value in range) { "value $value out of $range" }
             return encodeUnchecked(value)
         }
 
-        override fun decode(encoded: Int): Int {
+        override fun decode(encoded: Long): Long {
             require(encoded in range) { "encoded $encoded out of $range" }
             return decodeUnchecked(encoded)
         }
 
         // Iterator yields permuted values for inputs in [range.first+offset, range.last].
         // offset is measured in *indices* (0..n), consistent with base contract.
-        override fun iterator(offset: Int): IntIterator {
+        override fun iterator(offset: Long): LongIterator {
             require(offset in 0..n) { "offset $offset out of [0, $n]" }
             var i = offset
-            return object : IntIterator() {
+            return object : LongIterator() {
                 override fun hasNext() = i < n
-                override fun nextInt(): Int {
+                override fun nextLong(): Long {
                     if (!hasNext()) throw NoSuchElementException()
                     return start + this@range.encodeUnchecked(i++)
                 }

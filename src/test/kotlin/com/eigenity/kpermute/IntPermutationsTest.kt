@@ -9,7 +9,7 @@ class IntPermutationsTest {
     fun selectsImplementationBySize() {
         assertTrue(intPermutation(8) is ArrayIntPermutation)
         assertTrue(intPermutation(17) is HalfIntPermutation)
-        assertTrue(intPermutation(UInt.MAX_VALUE) is FullIntPermutation)
+        assertTrue(intPermutation(-1) is FullIntPermutation)
         assertTrue(intPermutation(-10) is UIntPermutation)
     }
 
@@ -44,7 +44,7 @@ class IntPermutationsTest {
 
     @Test
     fun fullSelectedForMaxUIntExplicit() {
-        val p = intPermutation(UInt.MAX_VALUE)
+        val p = intPermutation(-1)
         assertTrue(p is FullIntPermutation)
     }
 
@@ -52,17 +52,10 @@ class IntPermutationsTest {
     fun permutedByRoundTrip() {
         val p = ArrayIntPermutation(5, Random(7))
         val data = listOf("a", "b", "c", "d", "e")
-        val shuffled = data.permutedBy(p)
-        val restored = shuffled.unpermutedBy(p)
+        val shuffled = data.permuted(p)
+        val restored = shuffled.unpermuted(p)
         assertEquals(data, restored)
         assertEquals(data.toSet(), shuffled.toSet())
-    }
-
-    @Test
-    fun permuted() {
-        val data = listOf("a", "b", "c", "d", "e")
-        val shuffled = data.permuted(Random(24))
-        assertContentEquals(data, shuffled.sorted())
     }
 
     @Test
