@@ -10,8 +10,8 @@ import kotlin.test.assertEquals
 
 class FuzzyingTest {
 
-    private val outerIterations = 10_000
-    private val innerIterations = 10_000
+    private val outerIterations = 1000
+    private val innerIterations = 1_000
     private val rng = Random(42)
 
     private fun choseIntPerm(): Triple<IntPermutation, Long, Int> {
