@@ -5,6 +5,135 @@ import kotlin.test.*
 
 class LongPermutationsTest {
 
+
+    @Test
+    fun longRangeFactoryNormalCase() {
+        val range = 20L..29L
+        val p = longPermutation(range, rng = Random(1), rounds = 0)
+
+        assertEquals(range.count().toLong(), p.size)
+
+        for (v in range) {
+            val enc = p.encode(v)
+            assertTrue(enc in range)
+            assertEquals(v, p.decode(enc))
+        }
+    }
+
+    @Test
+    fun longRangeFactoryRejectsNonIncreasingRange() {
+        val range = 10L..5L  // last < first, nULong wraps
+        assertFailsWith<IllegalArgumentException> {
+            longPermutation(range, rng = Random(1), rounds = 0)
+        }
+    }
+
+    @Test
+    fun longRangeFactoryRejectsTooLargeRange() {
+        val huge = Long.MIN_VALUE..Long.MAX_VALUE
+        assertFailsWith<IllegalArgumentException> {
+            longPermutation(huge, rng = Random(1), rounds = 0)
+        }
+    }
+
+    @Test
+    fun longRangeFactorySeedOverloadRepeatable() {
+        val range = 100L..129L
+        val p1 = longPermutation(range, seed = 5678L, rounds = 0)
+        val p2 = longPermutation(range, seed = 5678L, rounds = 0)
+        assertEquals(p1.toList(), p2.toList())
+    }
+
+    @Test
+    fun longFactoryRejectsNegativeRounds() {
+        assertFailsWith<IllegalArgumentException> {
+            longPermutation(size = 10L, rng = Random(1), rounds = -1)
+        }
+    }
+
+    @Test
+    fun longFactorySelectsImplementationBySizeAndSign() {
+        assertTrue(
+            longPermutation(
+                size = -1L, rng = Random(1)
+            ) is FullLongPermutation
+        )
+        assertTrue(
+            longPermutation(
+                size = -5L, rng = Random(1)
+            ) is ULongPermutation
+        )
+        assertTrue(
+            longPermutation(
+                size = 0L, rng = Random(1)
+            ) is ArrayLongPermutation
+        )
+        assertTrue(
+            longPermutation(
+                size = 16L, rng = Random(1)
+            ) is ArrayLongPermutation
+        )
+        assertTrue(
+            longPermutation(
+                size = 17L, rng = Random(1)
+            ) is HalfLongPermutation
+        )
+    }
+
+    @Test
+    fun longFactoryDefaultRoundsForHalfAllSizeBands() {
+        // <= 2^10
+        val small = 600L
+        val pSmall = longPermutation(size = small, rng = Random(1), rounds = 0)
+        assertEquals(small, pSmall.size)
+        assertTrue(pSmall is HalfLongPermutation)
+
+        // (2^10, 2^20]
+        val medium = (1L shl 10) + 100L
+        val pMedium =
+            longPermutation(size = medium, rng = Random(2), rounds = 0)
+        assertEquals(medium, pMedium.size)
+        assertTrue(pMedium is HalfLongPermutation)
+
+        // > 2^20
+        val large = (1L shl 20) + 100L
+        val pLarge = longPermutation(size = large, rng = Random(3), rounds = 0)
+        assertEquals(large, pLarge.size)
+        assertTrue(pLarge is HalfLongPermutation)
+    }
+
+    @Test
+    fun longFactoryDefaultRoundsForULongAllBands() {
+        // <= 2^16
+        val smallNeg = -10L
+        val pSmall =
+            longPermutation(size = smallNeg, rng = Random(1), rounds = 0)
+        assertTrue(pSmall is ULongPermutation)
+
+        // (2^16, 2^24]
+        val midNeg = -((1L shl 16) + 100L)
+        val pMid = longPermutation(size = midNeg, rng = Random(2), rounds = 0)
+        assertTrue(pMid is ULongPermutation)
+
+        // > 2^24
+        val largeNeg = -((1L shl 24) + 100L)
+        val pLarge =
+            longPermutation(size = largeNeg, rng = Random(3), rounds = 0)
+        assertTrue(pLarge is ULongPermutation)
+
+        val sample = 42L
+        assertEquals(sample, pSmall.decode(pSmall.encode(sample)))
+        assertEquals(sample, pMid.decode(pMid.encode(sample)))
+        assertEquals(sample, pLarge.decode(pLarge.encode(sample)))
+    }
+
+    @Test
+    fun longFactorySeedOverloadRepeatable() {
+        val p1 = longPermutation(size = 32L, seed = 1234L, rounds = 0)
+        val p2 = longPermutation(size = 32L, seed = 1234L, rounds = 0)
+        assertEquals(p1.toList(), p2.toList())
+    }
+
     @Test
     fun selectsImplementationBySizeSentinels() {
         // Full domain sentinel
