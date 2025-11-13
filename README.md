@@ -1,9 +1,9 @@
 # KPermute
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.eigenity/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eigenity/kpermute/1.0.0)
-[![Build](https://github.com/Eigenity/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/Eigenity/kpermute/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/Eigenity/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/Eigenity/kpermute)
-[![License](https://img.shields.io/github/license/Eigenity/kpermute)](https://github.com/Eigenity/kpermute/blob/main/LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.0.0)
+[![Build](https://github.com/eignex/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/eignex/kpermute/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/eignex/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/eignex/kpermute)
+[![License](https://img.shields.io/github/license/eignex/kpermute)](https://github.com/eignex/kpermute/blob/main/LICENSE)
 
 > **Fast, deterministic integer permutation library for Kotlin.**  
 > Shuffle or obfuscate large integer domains efficiently using bijective,
@@ -37,7 +37,7 @@ Typical use cases:
 Add the dependency from Maven Central:
 
 ```kotlin
-implementation("com.eigenity:kpermute:1.0.0")
+implementation("com.eignex:kpermute:1.0.0")
 ```
 
 ---
