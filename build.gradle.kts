@@ -1,9 +1,9 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
     id("org.jetbrains.dokka") version "2.1.0"
-    id("org.jetbrains.kotlinx.kover") version "0.9.3"
+    id("org.jetbrains.kotlinx.kover") version "0.9.5"
     `maven-publish`
     signing
 
@@ -17,11 +17,10 @@ repositories { mavenCentral() }
 
 kotlin {
     jvmToolchain(21)
-    compilerOptions { jvmTarget.set(JVM_21) }
+    compilerOptions { jvmTarget.set(JvmTarget.JVM_21) }
 }
 
 java {
-    toolchain { languageVersion.set(JavaLanguageVersion.of(21)) }
     withSourcesJar()
     withJavadocJar()
 }
