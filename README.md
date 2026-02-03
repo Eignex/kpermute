@@ -44,7 +44,7 @@ Typical use cases:
 Add the dependency from Maven Central:
 
 ```kotlin
-implementation("com.eignex:kpermute:1.0.0")
+implementation("com.eignex:kpermute:1.0.1")
 ```
 
 ---

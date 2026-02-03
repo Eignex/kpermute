@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.eignex"
-version = "1.0.1"
+version = findProperty("ciVersion") as String? ?: "SNAPSHOT"
 
 repositories { mavenCentral() }
 
