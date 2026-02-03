@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.eignex"
-version = "1.0.2"
+version = "1.0.1"
 
 repositories { mavenCentral() }
 
