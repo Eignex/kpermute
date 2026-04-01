@@ -10,7 +10,7 @@
 
 # KPermute
 
-**Fast, deterministic integer permutation library for Kotlin.**
+Fast, deterministic integer permutation library for Kotlin.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.0.0)
 [![Build](https://github.com/eignex/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/eignex/kpermute/actions/workflows/build.yml)
@@ -19,19 +19,18 @@
   
 > Shuffle or obfuscate large integer domains efficiently using bijective,
 > reversible hash mixing.
->
-> ⚠️ **Not intended for cryptographic use.**  
-> Suitable for data masking, sampling, and reproducible pseudo-randomization
-> where reversibility is required. You decide if your use-case is cryptographic.
+
+**Not intended for cryptographic use.**
+Suitable for data masking, sampling, and reproducible pseudo-randomization
+where reversibility is required. You decide if your use-case is cryptographic.
 
 ---
 
 ## Overview
 
-`kpermute` generates stable, deterministic **pseudo-random permutations** over
-integer ranges.  
-Each seed defines a unique bijection between `[0, size)`.  
-The result acts like a **keyed shuffle**, repeatable, memory-efficient, and
+kpermute generates stable, deterministic pseudo-random permutations over
+integer ranges. Each seed defines a unique bijection between `[0, size)`.  
+The result acts like a keyed shuffle, repeatable, memory-efficient, and
 invertible.
 
 Typical use cases:
