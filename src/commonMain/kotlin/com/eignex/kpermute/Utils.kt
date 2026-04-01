@@ -4,9 +4,9 @@ internal object PermMathInt {
     /** k = min s.t. 2^k >= size (size in 1..2^31), mask = (2^k - 1), rshift ~= k*3/7 */
     fun block(sizeExclusive: Int): Triple<Int /*mask*/, Int /*kBits*/, Int /*rshift*/> {
         val k =
-            if (sizeExclusive <= 1) 1 else 32 - Integer.numberOfLeadingZeros(
-                sizeExclusive - 1
-            )
+            if (sizeExclusive <= 1) 1 else 32 - (
+                    sizeExclusive - 1
+                    ).countLeadingZeroBits()
         val mask = -1 ushr (32 - k)            // avoids 1 shl 31 overflow
         val rshift = (k * 3) / 7
         return Triple(mask, k, rshift)
@@ -35,7 +35,7 @@ internal object PermMathUInt {
     /** k = min s.t. 2^k >= size, mask = (2^k - 1) (k in 1..32). */
     fun block(sizeExclusive: UInt): Triple<UInt /*mask*/, Int /*kBits*/, Int /*rshift*/> {
         val k = if (sizeExclusive <= 1u) 1
-        else 32 - Integer.numberOfLeadingZeros((sizeExclusive - 1u).toInt())
+        else 32 - ((sizeExclusive - 1u).toInt()).countLeadingZeroBits()
         val mask = if (k == 32) 0xFFFF_FFFFu else (1u shl k) - 1u
         val rshift = (k * 3) / 7
         return Triple(mask, k, rshift)
@@ -65,7 +65,7 @@ internal object PermMathLong {
     /** k = min s.t. 2^k >= size (size in 1..2^63), mask = (2^k - 1), rshift ~= k*3/7 */
     fun block(sizeExclusive: Long): Triple<Long /*mask*/, Int /*kBits*/, Int /*rshift*/> {
         val k = if (sizeExclusive <= 1L) 1
-        else 64 - java.lang.Long.numberOfLeadingZeros(sizeExclusive - 1L)
+        else 64 - (sizeExclusive - 1L).countLeadingZeroBits()
         val mask = if (k == 64) -1L else -1L ushr (64 - k)
         val rshift = (k * 3) / 7
         return Triple(mask, k, rshift)
@@ -95,7 +95,7 @@ internal object PermMathULong {
     /** k = min s.t. 2^k >= size, mask = (2^k - 1) (k in 1..64). */
     fun block(sizeExclusive: ULong): Triple<ULong /*mask*/, Int /*kBits*/, Int /*rshift*/> {
         val k = if (sizeExclusive <= 1uL) 1
-        else 64 - java.lang.Long.numberOfLeadingZeros((sizeExclusive - 1uL).toLong())
+        else 64 - ((sizeExclusive - 1uL).toLong()).countLeadingZeroBits()
         val mask = if (k == 64) 0xFFFF_FFFF_FFFF_FFFFuL else (1uL shl k) - 1uL
         val rshift = (k * 3) / 7
         return Triple(mask, k, rshift)

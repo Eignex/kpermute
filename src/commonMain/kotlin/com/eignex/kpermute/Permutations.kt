@@ -2,6 +2,8 @@
 
 package com.eignex.kpermute
 
+import kotlin.jvm.JvmName
+import kotlin.jvm.JvmOverloads
 import kotlin.random.Random
 
 /**

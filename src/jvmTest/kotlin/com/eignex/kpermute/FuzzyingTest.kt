@@ -1,12 +1,8 @@
 package com.eignex.kpermute
 
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Test
 import kotlin.math.*
-import kotlin.random.Random
-import kotlin.random.nextUInt
-import kotlin.random.nextULong
-import kotlin.test.assertEquals
+import kotlin.random.*
+import kotlin.test.*
 
 class FuzzyingTest {
 
@@ -20,7 +16,8 @@ class FuzzyingTest {
             size = when (rng.nextInt(4)) {
                 0 -> rng.nextInt(17)        // ArrayIntPermutation
                 1 -> rng.nextInt()          // HalfIntPermutation (size > 0)
-                2 -> rng.nextUInt().toInt() // UIntPermutation (size < 0, except 0)
+                2 -> rng.nextUInt()
+                    .toInt() // UIntPermutation (size < 0, except 0)
                 else -> -1                  // FullIntPermutation sentinel
             }
         } while (size == 0)
@@ -35,7 +32,8 @@ class FuzzyingTest {
             size = when (rng.nextInt(4)) {
                 0 -> rng.nextLong(17L)        // ArrayLongPermutation
                 1 -> rng.nextLong()           // HalfLongPermutation (size > 0)
-                2 -> rng.nextULong().toLong() // ULongPermutation (size < 0, except 0)
+                2 -> rng.nextULong()
+                    .toLong() // ULongPermutation (size < 0, except 0)
                 else -> -1L                   // FullLongPermutation sentinel
             }
         } while (size == 0L)
@@ -114,10 +112,11 @@ class FuzzyingTest {
             val yf = yu.toDouble()
             stats.update(yf)
 
-            assertTrue(yu in 0u..<usize) {
+            assertTrue(
+                yu in 0u..<usize,
                 "support anomaly: perm=${perm::class.simpleName} size=$size " +
                         "rounds=$rounds seed=$seed"
-            }
+            )
         }
 
         val expectedMean = (usize.toDouble() - 1.0) / 2.0
@@ -160,10 +159,11 @@ class FuzzyingTest {
             val yf = yu.toDouble()
             stats.update(yf)
 
-            assertTrue(yu in 0u..<usize) {
+            assertTrue(
+                yu in 0u..<usize,
                 "support anomaly via iterator: perm=${perm::class.simpleName} size=$size " +
                         "rounds=$rounds seed=$seed"
-            }
+            )
 
             i++
             taken++
@@ -186,7 +186,11 @@ class FuzzyingTest {
             val className = perm::class.simpleName!!
 
             val pValue =
-                if (useIterator) runIntFuzzIterationUsingIterator(perm, seed, rounds)
+                if (useIterator) runIntFuzzIterationUsingIterator(
+                    perm,
+                    seed,
+                    rounds
+                )
                 else runIntFuzzIterationUsingEncode(perm, seed, rounds)
 
             pValuesByClass[className]!!.add(pValue)
@@ -229,10 +233,11 @@ class FuzzyingTest {
             val yf = yu.toDouble()
             stats.update(yf)
 
-            assertTrue(yu in 0uL..<usize) {
+            assertTrue(
+                yu in 0uL..<usize,
                 "support anomaly (Long): perm=${perm::class.simpleName} size=$size " +
                         "rounds=$rounds seed=$seed"
-            }
+            )
         }
 
         val expectedMean = (usize.toDouble() - 1.0) / 2.0
@@ -275,10 +280,11 @@ class FuzzyingTest {
             val yf = yu.toDouble()
             stats.update(yf)
 
-            assertTrue(yu in 0uL..<usize) {
+            assertTrue(
+                yu in 0uL..<usize,
                 "support anomaly via iterator (Long): perm=${perm::class.simpleName} size=$size " +
                         "rounds=$rounds seed=$seed"
-            }
+            )
 
             i++
             taken++
@@ -301,7 +307,11 @@ class FuzzyingTest {
             val className = perm::class.simpleName!!
 
             val pValue =
-                if (useIterator) runLongFuzzIterationUsingIterator(perm, seed, rounds)
+                if (useIterator) runLongFuzzIterationUsingIterator(
+                    perm,
+                    seed,
+                    rounds
+                )
                 else runLongFuzzIterationUsingEncode(perm, seed, rounds)
 
             pValuesByClass[className]!!.add(pValue)
