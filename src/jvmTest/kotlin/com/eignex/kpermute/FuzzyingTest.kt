@@ -1,5 +1,6 @@
 package com.eignex.kpermute
 
+import java.util.Locale
 import kotlin.math.*
 import kotlin.random.*
 import kotlin.test.*
@@ -216,7 +217,7 @@ class FuzzyingTest {
 
             if (outerIdx % 1_000 == 0 && outerIdx > 0) {
                 val s = pValuesByClass.map {
-                    "${it.key} = ${String.format("%.3f", it.value.average())}"
+                    "${it.key} = ${String.format(Locale.ENGLISH, "%.3f", it.value.average())}"
                 }.joinToString(", ")
                 println((if (useIterator) "[INT/ITER] " else "[INT/ENC] ") + s)
             }
@@ -347,7 +348,7 @@ class FuzzyingTest {
 
             if (outerIdx % 1_000 == 0 && outerIdx > 0) {
                 val s = pValuesByClass.map {
-                    "${it.key} = ${String.format("%.3f", it.value.average())}"
+                    "${it.key} = ${String.format(Locale.ENGLISH, "%.3f", it.value.average())}"
                 }.joinToString(", ")
                 println((if (useIterator) "[LONG/ITER] " else "[LONG/ENC] ") + s)
             }

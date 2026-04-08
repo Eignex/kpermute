@@ -91,9 +91,8 @@ class IntPermutationsTest {
 
     @Test
     fun intRangeFactoryRejectsEmptyOrDecreasingRange() {
-        val range = 10..5
         assertFailsWith<IllegalArgumentException> {
-            intPermutation(range, rng = Random(1), rounds = 0)
+            intPermutation(IntRange.EMPTY, rng = Random(1), rounds = 0)
         }
     }
 
