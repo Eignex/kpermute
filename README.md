@@ -12,7 +12,7 @@
 
 Fast, deterministic integer permutation library for Kotlin.
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.1.1)
+[![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.1.2)
 [![Build](https://github.com/eignex/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/eignex/kpermute/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/eignex/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/eignex/kpermute)
 [![License](https://img.shields.io/github/license/eignex/kpermute)](https://github.com/eignex/kpermute/blob/main/LICENSE)
@@ -48,7 +48,7 @@ Typical use cases:
 Add the dependency from Maven Central:
 
 ```kotlin
-implementation("com.eignex:kpermute:1.1.1")
+implementation("com.eignex:kpermute:1.1.2")
 ```
 
 ---
