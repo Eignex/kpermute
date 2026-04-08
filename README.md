@@ -12,11 +12,11 @@
 
 Fast, deterministic integer permutation library for Kotlin.
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.1.0)
+[![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute/1.1.1)
 [![Build](https://github.com/eignex/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/eignex/kpermute/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/eignex/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/eignex/kpermute)
 [![License](https://img.shields.io/github/license/eignex/kpermute)](https://github.com/eignex/kpermute/blob/main/LICENSE)
-  
+
 > Shuffle or obfuscate large integer domains efficiently using bijective,
 > reversible hash mixing.
 
@@ -29,7 +29,8 @@ where reversibility is required. You decide if your use-case is cryptographic.
 ## Overview
 
 kpermute generates stable, deterministic pseudo-random permutations over
-integer ranges. Each seed defines a unique bijection between `[0, size)`.  
+integer ranges. Each seed defines a unique bijection between `[0, size)`.
+
 The result acts like a keyed shuffle, repeatable, memory-efficient, and
 invertible.
 
@@ -47,42 +48,50 @@ Typical use cases:
 Add the dependency from Maven Central:
 
 ```kotlin
-implementation("com.eignex:kpermute:1.1.0")
+implementation("com.eignex:kpermute:1.1.1")
 ```
 
 ---
 
 ## Example Usage
 
+### Obfuscate numeric IDs reproducibly
+
 ```kotlin
-fun main() {
-    // Example 1: Obfuscate numeric IDs reproducibly
-    val idPerm = longPermutation(seed = 1L)
-    val longId = 49102490812045L
-    val intIdEncoded = idPerm.encode(longId)
-    println("encoded: $intIdEncoded (always prints 3631103739497407856)")
+val idPerm = longPermutation(seed = 1L)
+val longId = 49102490812045L
+val encoded = idPerm.encode(longId)
+println("encoded: $encoded (always prints 3631103739497407856)")
+```
 
-    // Example 2: Shuffle a large list lazily
-    val largeList = object : AbstractList<Int>() {
-        override val size: Int get() = Int.MAX_VALUE
-        override fun get(index: Int) = index
-    }
-    val perm = intPermutation(largeList.size)
-    val shuffled = largeList.permuted(perm)
-    println("shuffled: ${shuffled.take(20)}")
-    val unshuffled = shuffled.unpermuted(perm)
-    println("unshuffled: ${unshuffled.take(20)}")
+### Shuffle a large list lazily
 
-    // Example 3: Custom range permutation with negatives
-    val rangePerm = intPermutation(-100..199)
-    println("encode(-50): ${rangePerm.encode(-50)}")
-    println("decode(...): ${rangePerm.decode(rangePerm.encode(-50))}")
-
-    // Example 4: Full 2^32-bit domain permutation
-    val fullPerm = intPermutation(-1, seed = 1L)
-    println(fullPerm.encode(0)) // 1339315335
-    println(fullPerm.encode(1)) // -897806455
+```kotlin
+val largeList = object : AbstractList<Int>() {
+    override val size: Int get() = Int.MAX_VALUE
+    override fun get(index: Int) = index
 }
+val perm = intPermutation(largeList.size)
+val shuffled = largeList.permuted(perm)
+println("shuffled: ${shuffled.take(20)}")
+val unshuffled = shuffled.unpermuted(perm)
+println("unshuffled: ${unshuffled.take(20)}")
+```
+
+### Custom range permutation with negatives
+
+```kotlin
+val rangePerm = intPermutation(-100..199)
+println("encode(-50): ${rangePerm.encode(-50)}")
+println("decode(...): ${rangePerm.decode(rangePerm.encode(-50))}")
+```
+
+### Full 2^32-bit domain permutation
+
+```kotlin
+val fullPerm = intPermutation(-1, seed = 1L)
+println(fullPerm.encode(0)) // 1339315335
+println(fullPerm.encode(1)) // -897806455
 ```
 
 ---
