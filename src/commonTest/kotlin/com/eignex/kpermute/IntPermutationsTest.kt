@@ -16,27 +16,32 @@ class IntPermutationsTest {
     fun intFactorySelectsImplementationsBySizeAndSign() {
         assertTrue(
             intPermutation(
-                size = -1, rng = Random(1)
+                size = -1,
+                rng = Random(1)
             ) is FullIntPermutation
         )
         assertTrue(
             intPermutation(
-                size = -5, rng = Random(1)
+                size = -5,
+                rng = Random(1)
             ) is UIntPermutation
         )
         assertTrue(
             intPermutation(
-                size = 0, rng = Random(1)
+                size = 0,
+                rng = Random(1)
             ) is ArrayIntPermutation
         )
         assertTrue(
             intPermutation(
-                size = 16, rng = Random(1)
+                size = 16,
+                rng = Random(1)
             ) is ArrayIntPermutation
         )
         assertTrue(
             intPermutation(
-                size = 17, rng = Random(1)
+                size = 17,
+                rng = Random(1)
             ) is HalfIntPermutation
         )
     }
@@ -44,7 +49,7 @@ class IntPermutationsTest {
     @Test
     fun intFactoryDefaultRoundsForHalfAllSizeBands() {
         // <= 2^10 branch
-        val small = 600          // > 16 and <= 2^10
+        val small = 600 // > 16 and <= 2^10
         val pSmall = intPermutation(size = small, rng = Random(1), rounds = 0)
         assertEquals(small, pSmall.size)
         assertTrue(pSmall is HalfIntPermutation)
@@ -170,5 +175,4 @@ class IntPermutationsTest {
         assertTrue(list.all { it in 5..9 })
         assertEquals(list.toSet().size, 5)
     }
-
 }

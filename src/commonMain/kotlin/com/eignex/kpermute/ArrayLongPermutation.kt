@@ -31,8 +31,11 @@ class ArrayLongPermutation(
     override fun decodeUnchecked(encoded: Long): Long = inverse[encoded.toInt()]
 
     override fun iterator(offset: Long): LongIterator =
-        if (offset == 0L) array.iterator()
-        else array.sliceArray(offset.toInt()..<size.toInt()).iterator()
+        if (offset == 0L) {
+            array.iterator()
+        } else {
+            array.sliceArray(offset.toInt()..<size.toInt()).iterator()
+        }
 
     override fun toString(): String = "ArrayLongPermutation(size=$size)"
 }

@@ -34,7 +34,9 @@ class HalfIntPermutation(
         require((const % 2).absoluteValue == 1) { "const must be odd" }
 
         val (m, k, r) = PermMathInt.block(size)
-        mask = m; kBits = k; rshift = r
+        mask = m
+        kBits = k
+        rshift = r
         invConst = PermMathInt.invOdd32(const, mask)
     }
 

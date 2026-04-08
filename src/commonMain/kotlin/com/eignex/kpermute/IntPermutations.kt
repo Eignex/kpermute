@@ -51,8 +51,10 @@ interface IntPermutation : Iterable<Int> {
      * For finite domains (`size >= 0`), [value] must be in `[0, size)`.
      */
     fun encode(value: Int): Int {
-        if (size >= 0) require(value in 0 until size) {
-            "value $value out of range [0, $size)"
+        if (size >= 0) {
+            require(value in 0 until size) {
+                "value $value out of range [0, $size)"
+            }
         }
         return encodeUnchecked(value)
     }
@@ -63,8 +65,10 @@ interface IntPermutation : Iterable<Int> {
      * For finite domains (`size >= 0`), [encoded] must be in `[0, size)`.
      */
     fun decode(encoded: Int): Int {
-        if (size >= 0) require(encoded in 0 until size) {
-            "encoded $encoded out of range [0, $size)"
+        if (size >= 0) {
+            require(encoded in 0 until size) {
+                "encoded $encoded out of range [0, $size)"
+            }
         }
         return decodeUnchecked(encoded)
     }

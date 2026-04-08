@@ -5,7 +5,6 @@ import kotlin.test.*
 
 class LongPermutationsTest {
 
-
     @Test
     fun longRangeFactoryNormalCase() {
         val range = 20L..29L
@@ -22,7 +21,7 @@ class LongPermutationsTest {
 
     @Test
     fun longRangeFactoryRejectsNonIncreasingRange() {
-        val range = 10L..5L  // last < first, nULong wraps
+        val range = 10L..5L // last < first, nULong wraps
         assertFailsWith<IllegalArgumentException> {
             longPermutation(range, rng = Random(1), rounds = 0)
         }
@@ -55,27 +54,32 @@ class LongPermutationsTest {
     fun longFactorySelectsImplementationBySizeAndSign() {
         assertTrue(
             longPermutation(
-                size = -1L, rng = Random(1)
+                size = -1L,
+                rng = Random(1)
             ) is FullLongPermutation
         )
         assertTrue(
             longPermutation(
-                size = -5L, rng = Random(1)
+                size = -5L,
+                rng = Random(1)
             ) is ULongPermutation
         )
         assertTrue(
             longPermutation(
-                size = 0L, rng = Random(1)
+                size = 0L,
+                rng = Random(1)
             ) is ArrayLongPermutation
         )
         assertTrue(
             longPermutation(
-                size = 16L, rng = Random(1)
+                size = 16L,
+                rng = Random(1)
             ) is ArrayLongPermutation
         )
         assertTrue(
             longPermutation(
-                size = 17L, rng = Random(1)
+                size = 17L,
+                rng = Random(1)
             ) is HalfLongPermutation
         )
     }

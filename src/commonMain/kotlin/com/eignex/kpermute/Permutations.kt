@@ -29,15 +29,17 @@ import kotlin.random.Random
  */
 @JvmOverloads
 fun intPermutation(
-    size: Int = Int.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0
+    size: Int = Int.MAX_VALUE,
+    rng: Random = Random.Default,
+    rounds: Int = 0
 ): IntPermutation {
     require(rounds >= 0) { "rounds must be >= 0" }
 
     // Determine default rounds when not provided.
     fun defaultRoundsForHalf(n: Int): Int = when {
-        n <= 1 shl 10 -> 3          // up to 1 K
-        n <= 1 shl 20 -> 4          // up to 1 M
-        else -> 6                   // larger domains
+        n <= 1 shl 10 -> 3 // up to 1 K
+        n <= 1 shl 20 -> 4 // up to 1 M
+        else -> 6 // larger domains
     }
 
     fun defaultRoundsForUInt(n: Int): Int = when {
@@ -48,17 +50,22 @@ fun intPermutation(
 
     return when {
         size == -1 -> FullIntPermutation(
-            rng, if (rounds == 0) 2 else rounds // FullInt needs few rounds
+            rng,
+            if (rounds == 0) 2 else rounds // FullInt needs few rounds
         )
 
         size < 0 -> UIntPermutation(
-            size, rng, if (rounds == 0) defaultRoundsForUInt(size) else rounds
+            size,
+            rng,
+            if (rounds == 0) defaultRoundsForUInt(size) else rounds
         )
 
         size <= 16 -> ArrayIntPermutation(size, rng)
 
         else -> HalfIntPermutation(
-            size, rng, if (rounds == 0) defaultRoundsForHalf(size) else rounds
+            size,
+            rng,
+            if (rounds == 0) defaultRoundsForHalf(size) else rounds
         )
     }
 }
@@ -80,7 +87,9 @@ fun intPermutation(
  */
 @JvmOverloads
 fun intPermutation(
-    size: Int = Int.MAX_VALUE, seed: Long, rounds: Int = 0
+    size: Int = Int.MAX_VALUE,
+    seed: Long,
+    rounds: Int = 0
 ): IntPermutation = intPermutation(size, Random(seed), rounds)
 
 /**
@@ -102,7 +111,9 @@ fun intPermutation(
  */
 @JvmOverloads
 fun intPermutation(
-    range: IntRange, rng: Random = Random.Default, rounds: Int = 0
+    range: IntRange,
+    rng: Random = Random.Default,
+    rounds: Int = 0
 ): IntPermutation {
     val nLong = range.last.toLong() - range.first.toLong() + 1L
     require(nLong > 0L) {
@@ -129,7 +140,9 @@ fun intPermutation(
  * @see intPermutation
  */
 fun intPermutation(
-    range: IntRange, seed: Long, rounds: Int = 0
+    range: IntRange,
+    seed: Long,
+    rounds: Int = 0
 ): IntPermutation = intPermutation(range, Random(seed), rounds)
 
 /**
@@ -155,14 +168,16 @@ fun intPermutation(
  */
 @JvmOverloads
 fun longPermutation(
-    size: Long = Long.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0
+    size: Long = Long.MAX_VALUE,
+    rng: Random = Random.Default,
+    rounds: Int = 0
 ): LongPermutation {
     require(rounds >= 0) { "rounds must be >= 0" }
 
     fun defaultRoundsForHalf(n: Long): Int = when {
-        n <= 1L shl 10 -> 3          // up to 1 K
-        n <= 1L shl 20 -> 4          // up to 1 M
-        else -> 6                    // larger domains
+        n <= 1L shl 10 -> 3 // up to 1 K
+        n <= 1L shl 20 -> 4 // up to 1 M
+        else -> 6 // larger domains
     }
 
     fun defaultRoundsForULong(n: Long): Int = when {
@@ -173,17 +188,22 @@ fun longPermutation(
 
     return when {
         size == -1L -> FullLongPermutation(
-            rng, if (rounds == 0) 2 else rounds
+            rng,
+            if (rounds == 0) 2 else rounds
         )
 
         size < 0L -> ULongPermutation(
-            size, rng, if (rounds == 0) defaultRoundsForULong(-size) else rounds
+            size,
+            rng,
+            if (rounds == 0) defaultRoundsForULong(-size) else rounds
         )
 
         size <= 16L -> ArrayLongPermutation(size, rng)
 
         else -> HalfLongPermutation(
-            size, rng, if (rounds == 0) defaultRoundsForHalf(size) else rounds
+            size,
+            rng,
+            if (rounds == 0) defaultRoundsForHalf(size) else rounds
         )
     }
 }
@@ -204,7 +224,9 @@ fun longPermutation(
  * @see longPermutation
  */
 fun longPermutation(
-    size: Long = Long.MAX_VALUE, seed: Long, rounds: Int = 0
+    size: Long = Long.MAX_VALUE,
+    seed: Long,
+    rounds: Int = 0
 ): LongPermutation = longPermutation(size, Random(seed), rounds)
 
 /**
@@ -226,7 +248,9 @@ fun longPermutation(
  */
 @JvmOverloads
 fun longPermutation(
-    range: LongRange, rng: Random = Random.Default, rounds: Int = 0
+    range: LongRange,
+    rng: Random = Random.Default,
+    rounds: Int = 0
 ): LongPermutation {
     val nULong = range.last.toULong() - range.first.toULong() + 1uL
     require(nULong > 0uL) {
@@ -254,5 +278,7 @@ fun longPermutation(
  */
 @JvmOverloads
 fun longPermutation(
-    range: LongRange, seed: Long, rounds: Int = 0
+    range: LongRange,
+    seed: Long,
+    rounds: Int = 0
 ): LongPermutation = longPermutation(range, Random(seed), rounds)

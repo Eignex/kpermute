@@ -51,8 +51,10 @@ interface LongPermutation : Iterable<Long> {
      * For finite domains (`size >= 0L`), [value] must be in `[0, size)`.
      */
     fun encode(value: Long): Long {
-        if (size >= 0) require(value in 0 until size) {
-            "value $value out of range [0, $size)"
+        if (size >= 0) {
+            require(value in 0 until size) {
+                "value $value out of range [0, $size)"
+            }
         }
         return encodeUnchecked(value)
     }
@@ -63,8 +65,10 @@ interface LongPermutation : Iterable<Long> {
      * For finite domains (`size >= 0L`), [encoded] must be in `[0, size)`.
      */
     fun decode(encoded: Long): Long {
-        if (size >= 0) require(encoded in 0 until size) {
-            "encoded $encoded out of range [0, $size)"
+        if (size >= 0) {
+            require(encoded in 0 until size) {
+                "encoded $encoded out of range [0, $size)"
+            }
         }
         return decodeUnchecked(encoded)
     }
@@ -83,7 +87,6 @@ interface LongPermutation : Iterable<Long> {
      */
     fun iterator(offset: Long): LongIterator
 }
-
 
 /**
  * Returns a view of this permutation that operates on [range] instead of `[0, size)`.

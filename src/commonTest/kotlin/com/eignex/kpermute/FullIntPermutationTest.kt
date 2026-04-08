@@ -15,7 +15,13 @@ class FullIntPermutationTest {
     fun roundTripForRepresentativeValues() {
         val p = FullIntPermutation(Random(11), rounds = 3)
         val reps = intArrayOf(
-            0, 1, -1, Int.MAX_VALUE, Int.MIN_VALUE, 123456789, -987654321
+            0,
+            1,
+            -1,
+            Int.MAX_VALUE,
+            Int.MIN_VALUE,
+            123456789,
+            -987654321
         )
         for (v in reps) assertEquals(v, p.decode(p.encode(v)))
     }

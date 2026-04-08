@@ -32,8 +32,10 @@ class FullIntPermutation(
         var x = value
         repeat(rounds) { r ->
             x = x xor k1[r]
-            x = x xor (x ushr 16); x *= c1
-            x = x xor (x ushr 15); x *= c2
+            x = x xor (x ushr 16)
+            x *= c1
+            x = x xor (x ushr 15)
+            x *= c2
             x = x xor (x ushr 16)
             x = x xor k2[r]
         }
@@ -44,8 +46,10 @@ class FullIntPermutation(
         var y = encoded
         for (r in rounds - 1 downTo 0) {
             y = y xor k2[r]
-            y = PermMathInt.invXorShift(y, 16, 32, -1); y *= c2Inv
-            y = PermMathInt.invXorShift(y, 15, 32, -1); y *= c1Inv
+            y = PermMathInt.invXorShift(y, 16, 32, -1)
+            y *= c2Inv
+            y = PermMathInt.invXorShift(y, 15, 32, -1)
+            y *= c1Inv
             y = PermMathInt.invXorShift(y, 16, 32, -1)
             y = y xor k1[r]
         }

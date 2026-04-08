@@ -34,7 +34,9 @@ class HalfLongPermutation(
         require((const % 2L).absoluteValue == 1L) { "const must be odd" }
 
         val (m, k, r) = PermMathLong.block(size)
-        mask = m; kBits = k; rshift = r
+        mask = m
+        kBits = k
+        rshift = r
         invConst = PermMathLong.invOdd64(const, mask)
     }
 

@@ -35,7 +35,9 @@ class ULongPermutation(
         require(const % 2uL == 1uL) { "const must be odd" }
 
         val (m, k, r) = PermMathULong.block(usize)
-        mask = m; kBits = k; rshift = r
+        mask = m
+        kBits = k
+        rshift = r
         invConst = PermMathULong.invOdd64(const, mask)
     }
 

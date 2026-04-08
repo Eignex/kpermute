@@ -34,7 +34,9 @@ class UIntPermutation(
         require(const % 2u == 1u) { "const must be odd" }
 
         val (m, k, r) = PermMathUInt.block(size.toUInt())
-        mask = m; kBits = k; rshift = r
+        mask = m
+        kBits = k
+        rshift = r
         invConst = PermMathUInt.invOdd32(const, mask)
     }
 
@@ -74,5 +76,4 @@ class UIntPermutation(
     }
 
     override fun toString(): String = "UIntPermutation(size=$size)"
-
 }

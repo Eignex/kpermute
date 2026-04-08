@@ -32,8 +32,10 @@ class FullLongPermutation(
         var x = value
         repeat(rounds) { r ->
             x = x xor k1[r]
-            x = x xor (x ushr 30); x *= c1
-            x = x xor (x ushr 27); x *= c2
+            x = x xor (x ushr 30)
+            x *= c1
+            x = x xor (x ushr 27)
+            x *= c2
             x = x xor (x ushr 31)
             x = x xor k2[r]
         }
@@ -44,8 +46,10 @@ class FullLongPermutation(
         var y = encoded
         for (r in rounds - 1 downTo 0) {
             y = y xor k2[r]
-            y = PermMathLong.invXorShift(y, 31, 64, -1L); y *= c2Inv
-            y = PermMathLong.invXorShift(y, 27, 64, -1L); y *= c1Inv
+            y = PermMathLong.invXorShift(y, 31, 64, -1L)
+            y *= c2Inv
+            y = PermMathLong.invXorShift(y, 27, 64, -1L)
+            y *= c1Inv
             y = PermMathLong.invXorShift(y, 30, 64, -1L)
             y = y xor k1[r]
         }
