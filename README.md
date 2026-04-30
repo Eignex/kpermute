@@ -10,52 +10,33 @@
 
 # KPermute
 
-Fast, deterministic integer permutation library for Kotlin.
-
 [![Maven Central](https://img.shields.io/maven-central/v/com.eignex/kpermute.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/com.eignex/kpermute)
 [![Build](https://github.com/eignex/kpermute/actions/workflows/build.yml/badge.svg)](https://github.com/eignex/kpermute/actions/workflows/build.yml)
 [![codecov](https://codecov.io/gh/eignex/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/eignex/kpermute)
 [![License](https://img.shields.io/github/license/eignex/kpermute)](https://github.com/eignex/kpermute/blob/main/LICENSE)
 
-> Shuffle or obfuscate large integer domains efficiently using bijective,
-> reversible hash mixing.
-
-**Not intended for cryptographic use.**
-Suitable for data masking, sampling, and reproducible pseudo-randomization
-where reversibility is required. You decide if your use-case is cryptographic.
-
----
+KPermute generates fast, deterministic, reversible integer permutations over
+arbitrary integer domains using bijective hash mixing.
 
 ## Overview
 
-kpermute generates stable, deterministic pseudo-random permutations over
-integer ranges. Each seed defines a unique bijection between `[0, size)`.
+Each seed defines a unique bijection over `[0, size)`. The result behaves like
+a keyed shuffle: repeatable, memory-efficient, and invertible.
 
-The result acts like a keyed shuffle, repeatable, memory-efficient, and
-invertible.
+Typical uses are obfuscating numeric IDs (such as user or session numbers),
+generating reproducible pseudo-random shuffles, collision-free sampling and
+load balancing, and masking non-sensitive identifiers. It is not a cryptographic
+primitive; if your use case is cryptographic, choose a real cipher.
 
-Typical use cases:
-
-- Repeatable pseudo-random shuffles
-- Obfuscating integer IDs (e.g., user IDs, session numbers)
-- Collision-free sampling or load balancing
-- Data masking for non-sensitive identifiers
-
----
-
-## Installation
-
-Add the dependency from Maven Central:
+### Installation
 
 ```kotlin
 implementation("com.eignex:kpermute:1.1.2")
 ```
 
----
+## Usage
 
-## Example Usage
-
-### Obfuscate numeric IDs reproducibly
+Obfuscate a numeric ID reproducibly:
 
 ```kotlin
 val idPerm = longPermutation(seed = 1L)
@@ -64,7 +45,7 @@ val encoded = idPerm.encode(longId)
 println("encoded: $encoded (always prints 3631103739497407856)")
 ```
 
-### Shuffle a large list lazily
+Shuffle a large list lazily:
 
 ```kotlin
 val largeList = object : AbstractList<Int>() {
@@ -78,7 +59,7 @@ val unshuffled = shuffled.unpermuted(perm)
 println("unshuffled: ${unshuffled.take(20)}")
 ```
 
-### Custom range permutation with negatives
+Permute a custom range, including negatives:
 
 ```kotlin
 val rangePerm = intPermutation(-100..199)
@@ -86,7 +67,7 @@ println("encode(-50): ${rangePerm.encode(-50)}")
 println("decode(...): ${rangePerm.decode(rangePerm.encode(-50))}")
 ```
 
-### Full 2^32-bit domain permutation
+Permute the full 32-bit domain:
 
 ```kotlin
 val fullPerm = intPermutation(-1, seed = 1L)
@@ -98,50 +79,31 @@ println(fullPerm.encode(1)) // -897806455
 
 ## How It Works
 
-KPermute builds **keyed, reversible permutations** over integer domains using
-xor-shift-multiply mixers and cycle-walking.
-It never stores lookup tables and always supports decoding back to the original
-value.
+KPermute builds keyed, reversible permutations over integer domains using
+xor-shift-multiply mixers and cycle-walking. It never stores lookup tables, and
+every output decodes back to its original value.
 
-### Domains and Implementations
-
-Each permutation has a `size`:
-
-* `size > 0` → finite domain `[0, size)`
-* `size == -1` / `-1L` → full 32- or 64-bit domain
-* `size < 0` (not `-1`) → unsigned variants via `UIntPermutation` /
-  `ULongPermutation`
-
-Factory functions select implementations:
+A permutation is selected by its `size`. A positive size means a finite domain
+`[0, size)`. A size of `-1` or `-1L` means the full 32- or 64-bit signed
+domain. Other negative sizes select the unsigned variants via `UIntPermutation`
+or `ULongPermutation`.
 
 | Domain Type       | Implementation               | Description                     |
 |-------------------|------------------------------|---------------------------------|
 | Tiny (`≤16`)      | `Array[Int/Long]Permutation` | Uses shuffled array and inverse |
 | Finite            | `Half[Int/Long]Permutation`  | Uses cycle-walking              |
 | Full bit-width    | `Full[Int/Long]Permutation`  | No cycle-walking                |
-| Unsigned variants | `U[Int/Long]Permutation`     | Modulo `2^32` or `2^64`         |                                 |
+| Unsigned variants | `U[Int/Long]Permutation`     | Modulo `2^32` or `2^64`         |
 
 Range factories like `intPermutation(range)` and `longPermutation(range)` wrap
-these with a `range(...)` view, so you can permute directly on intervals such as
-`-100..199`.
+these with a `range(...)` view, so you can permute directly on intervals such
+as `-100..199`.
 
----
-
-### Mixing and Cycle-Walking
-
-Each permutation round:
-
-1. Multiplies by an odd constant.
-2. Adds or xors a secret per-round key.
-3. Applies xor-shift steps (`x ^= x >>> s`) to diffuse bits.
-
-All steps are invertible using modular inverses and xor-shift
-inversion [1] [3] [4] [5].
-For non-power-of-two domains, KPermute uses **cycle-walking** [1] [2]: permute
-in
-the next power-of-two space and retry until the output falls in `[0, size)`.
-
----
+Each round multiplies by an odd constant, adds or xors a secret per-round key,
+and applies xor-shift steps (`x ^= x >>> s`) to diffuse bits. Every step is
+invertible via modular inverses and xor-shift inversion [1] [3] [4] [5]. For
+non-power-of-two domains KPermute uses cycle-walking [1] [2]: permute in the
+next power-of-two space and retry until the output falls in `[0, size)`.
 
 ## References
 
@@ -172,5 +134,3 @@ the next power-of-two space and retry until the output falls in `[0, size)`.
    *TOMS 42(4), 2016.* [Preprint][5]
 6. Y. Collet,
    “xxHash – Extremely fast hash algorithm,” 2014. [GitHub][6]
-
----
