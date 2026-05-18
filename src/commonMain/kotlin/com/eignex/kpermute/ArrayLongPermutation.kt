@@ -8,7 +8,7 @@ import kotlin.random.Random
  * Builds a random bijection over `[0, size)` by shuffling the identity mapping
  * and precomputing the inverse. Encode and decode are O(1) array lookups.
  *
- * @param [size] Size of the permutation domain; valid inputs are `[0, size)`.
+ * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
  * @param [rng] Random generator used to create the shuffled mapping.
  */
 class ArrayLongPermutation(

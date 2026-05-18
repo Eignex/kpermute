@@ -10,7 +10,7 @@ import kotlin.random.Random
  * affine steps plus XOR-shift mixing. Outputs outside `[0, size)` are
  * rejected and walked until they fall back inside the domain.
  *
- * @param [size] Size of the permutation domain; valid inputs are `[0, size)`.
+ * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
  * @param [rng] Random generator used to derive per-round keys.
  * @param [rounds] Number of mixing rounds; higher values increase dispersion.
  * @param [const] Odd multiplicative constant used in each affine step.

@@ -9,7 +9,7 @@ import kotlin.random.Random
  * steps and XOR-shift mixing within a 2^k block. Cycle walking ensures that
  * all outputs stay inside the unsigned domain.
  *
- * @param [size] Size of the unsigned domain encoded as an `Int`.
+ * @property [size] Size of the unsigned domain encoded as an `Int`.
  * @param [rng] Random generator used to derive per-round keys.
  * @param [rounds] Number of mixing rounds; higher values increase dispersion.
  * @param [const] Odd multiplicative constant used in each affine step.
