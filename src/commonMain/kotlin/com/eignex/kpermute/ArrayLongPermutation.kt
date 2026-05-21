@@ -11,10 +11,7 @@ import kotlin.random.Random
  * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
  * @param [rng] Random generator used to create the shuffled mapping.
  */
-class ArrayLongPermutation(
-    override val size: Long,
-    rng: Random
-) : LongPermutation {
+class ArrayLongPermutation(override val size: Long, rng: Random) : LongPermutation {
     private val array = LongArray(size.toInt()) { it.toLong() }
     private val inverse: LongArray
 
@@ -30,12 +27,11 @@ class ArrayLongPermutation(
 
     override fun decodeUnchecked(encoded: Long): Long = inverse[encoded.toInt()]
 
-    override fun iterator(offset: Long): LongIterator =
-        if (offset == 0L) {
-            array.iterator()
-        } else {
-            array.sliceArray(offset.toInt()..<size.toInt()).iterator()
-        }
+    override fun iterator(offset: Long): LongIterator = if (offset == 0L) {
+        array.iterator()
+    } else {
+        array.sliceArray(offset.toInt()..<size.toInt()).iterator()
+    }
 
     override fun toString(): String = "ArrayLongPermutation(size=$size)"
 }

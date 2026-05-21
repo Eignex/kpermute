@@ -55,32 +55,32 @@ class LongPermutationsTest {
         assertTrue(
             longPermutation(
                 size = -1L,
-                rng = Random(1)
-            ) is FullLongPermutation
+                rng = Random(1),
+            ) is FullLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = -5L,
-                rng = Random(1)
-            ) is ULongPermutation
+                rng = Random(1),
+            ) is ULongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 0L,
-                rng = Random(1)
-            ) is ArrayLongPermutation
+                rng = Random(1),
+            ) is ArrayLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 16L,
-                rng = Random(1)
-            ) is ArrayLongPermutation
+                rng = Random(1),
+            ) is ArrayLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 17L,
-                rng = Random(1)
-            ) is HalfLongPermutation
+                rng = Random(1),
+            ) is HalfLongPermutation,
         )
     }
 

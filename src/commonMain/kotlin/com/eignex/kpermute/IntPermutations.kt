@@ -52,11 +52,9 @@ fun IntPermutation.range(range: IntRange): IntPermutation {
         override val size: Int = n
 
         // Unchecked operate on *range values*.
-        override fun encodeUnchecked(value: Int): Int =
-            start + this@range.encodeUnchecked(value - start)
+        override fun encodeUnchecked(value: Int): Int = start + this@range.encodeUnchecked(value - start)
 
-        override fun decodeUnchecked(encoded: Int): Int =
-            start + this@range.decodeUnchecked(encoded - start)
+        override fun decodeUnchecked(encoded: Int): Int = start + this@range.decodeUnchecked(encoded - start)
 
         // Checked wrappers validate range membership.
         override fun encode(value: Int): Int {

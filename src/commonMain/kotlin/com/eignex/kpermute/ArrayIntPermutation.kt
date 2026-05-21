@@ -11,10 +11,7 @@ import kotlin.random.Random
  * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
  * @param [rng] Random generator used to create the shuffled mapping.
  */
-class ArrayIntPermutation(
-    override val size: Int,
-    rng: Random
-) : IntPermutation {
+class ArrayIntPermutation(override val size: Int, rng: Random) : IntPermutation {
     private val array = IntArray(size) { it }
     private val inverse: IntArray
 
@@ -30,12 +27,11 @@ class ArrayIntPermutation(
 
     override fun decodeUnchecked(encoded: Int): Int = inverse[encoded]
 
-    override fun iterator(offset: Int): IntIterator =
-        if (offset == 0) {
-            array.iterator()
-        } else {
-            array.sliceArray(offset..<size).iterator()
-        }
+    override fun iterator(offset: Int): IntIterator = if (offset == 0) {
+        array.iterator()
+    } else {
+        array.sliceArray(offset..<size).iterator()
+    }
 
     override fun toString(): String = "ArrayIntPermutation(size=$size)"
 }

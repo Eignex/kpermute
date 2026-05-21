@@ -42,21 +42,21 @@ class HalfIntPermutationTest {
         assertFailsWith<IllegalArgumentException> {
             HalfIntPermutation(
                 0,
-                Random(1)
+                Random(1),
             )
         }
         assertFailsWith<IllegalArgumentException> {
             HalfIntPermutation(
                 10,
                 Random(1),
-                rounds = 0
+                rounds = 0,
             )
         }
         assertFailsWith<IllegalArgumentException> {
             HalfIntPermutation(
                 10,
                 Random(1),
-                const = 2
+                const = 2,
             )
         }
     }

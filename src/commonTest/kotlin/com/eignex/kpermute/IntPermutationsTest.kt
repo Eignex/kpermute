@@ -17,32 +17,32 @@ class IntPermutationsTest {
         assertTrue(
             intPermutation(
                 size = -1,
-                rng = Random(1)
-            ) is FullIntPermutation
+                rng = Random(1),
+            ) is FullIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = -5,
-                rng = Random(1)
-            ) is UIntPermutation
+                rng = Random(1),
+            ) is UIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 0,
-                rng = Random(1)
-            ) is ArrayIntPermutation
+                rng = Random(1),
+            ) is ArrayIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 16,
-                rng = Random(1)
-            ) is ArrayIntPermutation
+                rng = Random(1),
+            ) is ArrayIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 17,
-                rng = Random(1)
-            ) is HalfIntPermutation
+                rng = Random(1),
+            ) is HalfIntPermutation,
         )
     }
 

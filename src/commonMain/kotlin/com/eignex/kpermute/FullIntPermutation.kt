@@ -18,7 +18,7 @@ class FullIntPermutation(
     rng: Random = Random.Default,
     private val rounds: Int = 2,
     private val c1: Int = -2048144789,
-    private val c2: Int = -1028477387
+    private val c2: Int = -1028477387,
 ) : IntPermutation {
 
     override val size: Int get() = -1

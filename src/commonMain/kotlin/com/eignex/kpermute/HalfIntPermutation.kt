@@ -19,7 +19,7 @@ class HalfIntPermutation(
     override val size: Int = Int.MAX_VALUE,
     rng: Random = Random.Default,
     private val rounds: Int = 3,
-    private val const: Int = -1640531535
+    private val const: Int = -1640531535,
 ) : IntPermutation {
 
     private val mask: Int
