@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    id("com.eignex.kmp") version "1.2.0"
+    id("com.eignex.kmp") version "1.2.1"
 }
 
 eignexPublish {
