@@ -213,7 +213,7 @@ class FuzzyingTest {
                     runIntFuzzIterationUsingEncode(perm, seed, rounds)
                 }
 
-            pValuesByClass[className]!!.add(pValue)
+            pValuesByClass.getValue(className).add(pValue)
 
             if (outerIdx % 1_000 == 0 && outerIdx > 0) {
                 val s = pValuesByClass.map {
@@ -344,7 +344,7 @@ class FuzzyingTest {
                     runLongFuzzIterationUsingEncode(perm, seed, rounds)
                 }
 
-            pValuesByClass[className]!!.add(pValue)
+            pValuesByClass.getValue(className).add(pValue)
 
             if (outerIdx % 1_000 == 0 && outerIdx > 0) {
                 val s = pValuesByClass.map {
