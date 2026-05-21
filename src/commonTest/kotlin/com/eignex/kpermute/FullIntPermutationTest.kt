@@ -21,7 +21,7 @@ class FullIntPermutationTest {
             Int.MAX_VALUE,
             Int.MIN_VALUE,
             123456789,
-            -987654321
+            -987654321,
         )
         for (v in reps) assertEquals(v, p.decode(p.encode(v)))
     }

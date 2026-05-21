@@ -15,11 +15,17 @@ class FuzzyingTest {
         var size: Int
         do {
             size = when (rng.nextInt(4)) {
-                0 -> rng.nextInt(17) // ArrayIntPermutation
-                1 -> rng.nextInt() // HalfIntPermutation (size > 0)
-                2 -> rng.nextUInt()
-                    .toInt() // UIntPermutation (size < 0, except 0)
-                else -> -1 // FullIntPermutation sentinel
+                // ArrayIntPermutation
+                0 -> rng.nextInt(17)
+
+                // HalfIntPermutation (size > 0)
+                1 -> rng.nextInt()
+
+                // UIntPermutation (size < 0, except 0)
+                2 -> rng.nextUInt().toInt()
+
+                // FullIntPermutation sentinel
+                else -> -1
             }
         } while (size == 0)
         val rounds = rng.nextInt(2, 8)
@@ -31,11 +37,17 @@ class FuzzyingTest {
         var size: Long
         do {
             size = when (rng.nextInt(4)) {
-                0 -> rng.nextLong(17L) // ArrayLongPermutation
-                1 -> rng.nextLong() // HalfLongPermutation (size > 0)
-                2 -> rng.nextULong()
-                    .toLong() // ULongPermutation (size < 0, except 0)
-                else -> -1L // FullLongPermutation sentinel
+                // ArrayLongPermutation
+                0 -> rng.nextLong(17L)
+
+                // HalfLongPermutation (size > 0)
+                1 -> rng.nextLong()
+
+                // ULongPermutation (size < 0, except 0)
+                2 -> rng.nextULong().toLong()
+
+                // FullLongPermutation sentinel
+                else -> -1L
             }
         } while (size == 0L)
         val rounds = rng.nextInt(2, 8)
@@ -63,12 +75,7 @@ class FuzzyingTest {
         return if (x > 0.0) 1.0 - prob else prob
     }
 
-    private fun meanTPValue(
-        mean: Double,
-        expectedMean: Double,
-        variance: Double,
-        n: Int
-    ): Double {
+    private fun meanTPValue(mean: Double, expectedMean: Double, variance: Double, n: Int): Double {
         if (variance <= 0.0 || n <= 1) return 1.0
         val s = sqrt(variance)
         val t = (mean - expectedMean) / (s / sqrt(n.toDouble()))
@@ -77,11 +84,7 @@ class FuzzyingTest {
         return p.coerceIn(0.0, 1.0)
     }
 
-    private data class Stats(
-        var mean: Double = 0.0,
-        var m2: Double = 0.0,
-        var count: Int = 0
-    )
+    private data class Stats(var mean: Double = 0.0, var m2: Double = 0.0, var count: Int = 0)
 
     private fun Stats.update(yf: Double) {
         count++
@@ -95,11 +98,7 @@ class FuzzyingTest {
         return meanTPValue(mean, expectedMean, variance, count)
     }
 
-    private fun runIntFuzzIterationUsingEncode(
-        perm: IntPermutation,
-        seed: Long,
-        rounds: Int
-    ): Double {
+    private fun runIntFuzzIterationUsingEncode(perm: IntPermutation, seed: Long, rounds: Int): Double {
         val stats = Stats()
         val size = perm.size
         val usize = size.toUInt()
@@ -117,7 +116,7 @@ class FuzzyingTest {
                 x,
                 z,
                 "round-trip failed: " +
-                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z"
+                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z",
             )
 
             val yu = y.toUInt()
@@ -127,7 +126,7 @@ class FuzzyingTest {
             assertTrue(
                 yu in 0u..<usize,
                 "support anomaly: perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed"
+                    "rounds=$rounds seed=$seed",
             )
         }
 
@@ -135,11 +134,7 @@ class FuzzyingTest {
         return stats.pValue(expectedMean)
     }
 
-    private fun runIntFuzzIterationUsingIterator(
-        perm: IntPermutation,
-        seed: Long,
-        rounds: Int
-    ): Double {
+    private fun runIntFuzzIterationUsingIterator(perm: IntPermutation, seed: Long, rounds: Int): Double {
         val stats = Stats()
         val size = perm.size
         val usize = size.toUInt()
@@ -163,13 +158,13 @@ class FuzzyingTest {
                 y,
                 perm.encode(i),
                 "iterator mismatch: " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y"
+                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y",
             )
             assertEquals(
                 i,
                 x,
                 "decode(encode(i)) mismatch via iterator: " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x"
+                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x",
             )
 
             val yu = y.toUInt()
@@ -179,7 +174,7 @@ class FuzzyingTest {
             assertTrue(
                 yu in 0u..<usize,
                 "support anomaly via iterator: perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed"
+                    "rounds=$rounds seed=$seed",
             )
 
             i++
@@ -207,7 +202,7 @@ class FuzzyingTest {
                     runIntFuzzIterationUsingIterator(
                         perm,
                         seed,
-                        rounds
+                        rounds,
                     )
                 } else {
                     runIntFuzzIterationUsingEncode(perm, seed, rounds)
@@ -224,11 +219,7 @@ class FuzzyingTest {
         }
     }
 
-    private fun runLongFuzzIterationUsingEncode(
-        perm: LongPermutation,
-        seed: Long,
-        rounds: Int
-    ): Double {
+    private fun runLongFuzzIterationUsingEncode(perm: LongPermutation, seed: Long, rounds: Int): Double {
         val stats = Stats()
         val size = perm.size
         val usize = size.toULong()
@@ -248,7 +239,7 @@ class FuzzyingTest {
                 x,
                 z,
                 "round-trip failed (Long): " +
-                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z perm=${perm::class.simpleName}"
+                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z perm=${perm::class.simpleName}",
             )
 
             val yu = y.toULong()
@@ -258,7 +249,7 @@ class FuzzyingTest {
             assertTrue(
                 yu in 0uL..<usize,
                 "support anomaly (Long): perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed"
+                    "rounds=$rounds seed=$seed",
             )
         }
 
@@ -266,11 +257,7 @@ class FuzzyingTest {
         return stats.pValue(expectedMean)
     }
 
-    private fun runLongFuzzIterationUsingIterator(
-        perm: LongPermutation,
-        seed: Long,
-        rounds: Int
-    ): Double {
+    private fun runLongFuzzIterationUsingIterator(perm: LongPermutation, seed: Long, rounds: Int): Double {
         val stats = Stats()
         val size = perm.size
         val usize = size.toULong()
@@ -294,13 +281,13 @@ class FuzzyingTest {
                 y,
                 perm.encode(i),
                 "iterator mismatch (Long): " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y perm=${perm::class.simpleName}"
+                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y perm=${perm::class.simpleName}",
             )
             assertEquals(
                 i,
                 x,
                 "decode(encode(i)) mismatch via iterator (Long): " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x perm=${perm::class.simpleName}"
+                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x perm=${perm::class.simpleName}",
             )
 
             val yu = y.toULong()
@@ -310,7 +297,7 @@ class FuzzyingTest {
             assertTrue(
                 yu in 0uL..<usize,
                 "support anomaly via iterator (Long): perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed"
+                    "rounds=$rounds seed=$seed",
             )
 
             i++
@@ -338,7 +325,7 @@ class FuzzyingTest {
                     runLongFuzzIterationUsingIterator(
                         perm,
                         seed,
-                        rounds
+                        rounds,
                     )
                 } else {
                     runLongFuzzIterationUsingEncode(perm, seed, rounds)

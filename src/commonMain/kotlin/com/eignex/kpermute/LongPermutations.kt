@@ -17,11 +17,9 @@ fun LongPermutation.range(range: LongRange): LongPermutation {
         override val size: Long = n
 
         // Unchecked operate on *range values*.
-        override fun encodeUnchecked(value: Long): Long =
-            start + this@range.encodeUnchecked(value - start)
+        override fun encodeUnchecked(value: Long): Long = start + this@range.encodeUnchecked(value - start)
 
-        override fun decodeUnchecked(encoded: Long): Long =
-            start + this@range.decodeUnchecked(encoded - start)
+        override fun decodeUnchecked(encoded: Long): Long = start + this@range.decodeUnchecked(encoded - start)
 
         // Checked wrappers validate range membership.
         override fun encode(value: Long): Long {

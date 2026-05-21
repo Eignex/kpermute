@@ -22,11 +22,7 @@ object CommonAssertsLong {
     }
 
     /** Verify iterator yields encode(i) for i in [offset, size). */
-    fun assertIteratorMatchesEncode(
-        p: LongPermutation,
-        size: Long,
-        offset: Long = 0L
-    ) {
+    fun assertIteratorMatchesEncode(p: LongPermutation, size: Long, offset: Long = 0L) {
         val it = p.iterator(offset)
         val actual = it.asSequence().toList()
 
@@ -51,17 +47,13 @@ object CommonAssertsLong {
         for (i in 0 until n) {
             assertEquals(
                 p1.encode(i.toLong()),
-                p2.encode(i.toLong())
+                p2.encode(i.toLong()),
             )
         }
     }
 
     /** Verify different seeds or rounds change mapping. */
-    fun assertDifferentMapping(
-        p1: LongPermutation,
-        p2: LongPermutation,
-        sample: Long = 42L
-    ) {
+    fun assertDifferentMapping(p1: LongPermutation, p2: LongPermutation, sample: Long = 42L) {
         assertNotEquals(p1.encode(sample), p2.encode(sample))
     }
 

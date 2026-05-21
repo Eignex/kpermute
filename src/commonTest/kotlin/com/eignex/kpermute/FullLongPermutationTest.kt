@@ -21,7 +21,7 @@ class FullLongPermutationTest {
             Long.MAX_VALUE,
             Long.MIN_VALUE,
             123_456_789L,
-            -987_654_321L
+            -987_654_321L,
         )
         for (v in reps) assertEquals(v, p.decode(p.encode(v)))
     }
@@ -45,7 +45,7 @@ class FullLongPermutationTest {
             100L,
             -1L,
             Long.MAX_VALUE,
-            Long.MIN_VALUE
+            Long.MIN_VALUE,
         )
         for (x in samples) {
             assertEquals(p1.encode(x), p2.encode(x))

@@ -18,11 +18,7 @@ object CommonAssertsInt {
     }
 
     /** Verify iterator yields encode(i) for i in [offset, size). */
-    fun assertIteratorMatchesEncode(
-        p: IntPermutation,
-        size: Int,
-        offset: Int = 0
-    ) {
+    fun assertIteratorMatchesEncode(p: IntPermutation, size: Int, offset: Int = 0) {
         val it = p.iterator(offset)
         val actual = it.asSequence().toList()
         val expected = (offset until size).map { p.encode(it) }
@@ -42,11 +38,7 @@ object CommonAssertsInt {
     }
 
     /** Verify different seeds or rounds change mapping. */
-    fun assertDifferentMapping(
-        p1: IntPermutation,
-        p2: IntPermutation,
-        sample: Int = 42
-    ) {
+    fun assertDifferentMapping(p1: IntPermutation, p2: IntPermutation, sample: Int = 42) {
         assertNotEquals(p1.encode(sample), p2.encode(sample))
     }
 

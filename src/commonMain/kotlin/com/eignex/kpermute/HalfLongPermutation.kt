@@ -19,7 +19,7 @@ class HalfLongPermutation(
     override val size: Long = Long.MAX_VALUE,
     rng: Random = Random.Default,
     private val rounds: Int = 3,
-    private val const: Long = 0x52A531B54E4EC5CBL
+    private val const: Long = 0x52A531B54E4EC5CBL,
 ) : LongPermutation {
 
     private val mask: Long
