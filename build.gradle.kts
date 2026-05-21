@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     id("com.eignex.kmp") version "1.2.0"
 }
@@ -11,6 +13,7 @@ eignexPublish {
 }
 
 
+@OptIn(ExperimentalWasmDsl::class)
 kotlin {
     jvm()
     js(IR) { browser(); nodejs() }
