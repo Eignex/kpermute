@@ -31,7 +31,7 @@ primitive; if your use case is cryptographic, choose a real cipher.
 ### Installation
 
 ```kotlin
-implementation("com.eignex:kpermute:1.1.2")
+implementation("com.eignex:kpermute:1.2.0")
 ```
 
 ## Usage
