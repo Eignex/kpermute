@@ -16,7 +16,7 @@ eignexPublish {
 @OptIn(ExperimentalWasmDsl::class)
 kotlin {
     jvm()
-    js(IR) { browser(); nodejs() }
+    js { browser(); nodejs() }
     wasmJs { browser(); nodejs() }
     wasmWasi { nodejs() }
     linuxX64(); linuxArm64()
