@@ -1,0 +1,191 @@
+public final class com/eignex/kpermute/ArrayIntPermutation : com/eignex/kpermute/IntPermutation {
+	public fun <init> (ILkotlin/random/Random;)V
+	public fun decode (I)I
+	public fun decodeUnchecked (I)I
+	public fun encode (I)I
+	public fun encodeUnchecked (I)I
+	public fun getSize ()I
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public fun iterator (I)Lkotlin/collections/IntIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/ArrayLongPermutation : com/eignex/kpermute/LongPermutation {
+	public fun <init> (JLkotlin/random/Random;)V
+	public fun decode (J)J
+	public fun decodeUnchecked (J)J
+	public fun encode (J)J
+	public fun encodeUnchecked (J)J
+	public fun getSize ()J
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/LongIterator;
+	public fun iterator (J)Lkotlin/collections/LongIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/FullIntPermutation : com/eignex/kpermute/IntPermutation {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/random/Random;III)V
+	public synthetic fun <init> (Lkotlin/random/Random;IIIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (I)I
+	public fun decodeUnchecked (I)I
+	public fun encode (I)I
+	public fun encodeUnchecked (I)I
+	public fun getSize ()I
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public fun iterator (I)Lkotlin/collections/IntIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/FullLongPermutation : com/eignex/kpermute/LongPermutation {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/random/Random;IJJ)V
+	public synthetic fun <init> (Lkotlin/random/Random;IJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (J)J
+	public fun decodeUnchecked (J)J
+	public fun encode (J)J
+	public fun encodeUnchecked (J)J
+	public fun getSize ()J
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/LongIterator;
+	public fun iterator (J)Lkotlin/collections/LongIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/HalfIntPermutation : com/eignex/kpermute/IntPermutation {
+	public fun <init> ()V
+	public fun <init> (ILkotlin/random/Random;II)V
+	public synthetic fun <init> (ILkotlin/random/Random;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (I)I
+	public fun decodeUnchecked (I)I
+	public fun encode (I)I
+	public fun encodeUnchecked (I)I
+	public fun getSize ()I
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public fun iterator (I)Lkotlin/collections/IntIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/HalfLongPermutation : com/eignex/kpermute/LongPermutation {
+	public fun <init> ()V
+	public fun <init> (JLkotlin/random/Random;IJ)V
+	public synthetic fun <init> (JLkotlin/random/Random;IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (J)J
+	public fun decodeUnchecked (J)J
+	public fun encode (J)J
+	public fun encodeUnchecked (J)J
+	public fun getSize ()J
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/LongIterator;
+	public fun iterator (J)Lkotlin/collections/LongIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class com/eignex/kpermute/IntPermutation : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun decode (I)I
+	public abstract fun decodeUnchecked (I)I
+	public fun encode (I)I
+	public abstract fun encodeUnchecked (I)I
+	public abstract fun getSize ()I
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public abstract fun iterator (I)Lkotlin/collections/IntIterator;
+}
+
+public final class com/eignex/kpermute/IntPermutation$DefaultImpls {
+	public static fun decode (Lcom/eignex/kpermute/IntPermutation;I)I
+	public static fun encode (Lcom/eignex/kpermute/IntPermutation;I)I
+	public static fun iterator (Lcom/eignex/kpermute/IntPermutation;)Lkotlin/collections/IntIterator;
+}
+
+public final class com/eignex/kpermute/IntPermutationsKt {
+	public static final fun permuted (Ljava/util/List;Lcom/eignex/kpermute/IntPermutation;)Ljava/util/List;
+	public static synthetic fun permuted$default (Ljava/util/List;Lcom/eignex/kpermute/IntPermutation;ILjava/lang/Object;)Ljava/util/List;
+	public static final fun range (Lcom/eignex/kpermute/IntPermutation;Lkotlin/ranges/IntRange;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun unpermuted (Ljava/util/List;Lcom/eignex/kpermute/IntPermutation;)Ljava/util/List;
+}
+
+public abstract interface class com/eignex/kpermute/LongPermutation : java/lang/Iterable, kotlin/jvm/internal/markers/KMappedMarker {
+	public fun decode (J)J
+	public abstract fun decodeUnchecked (J)J
+	public fun encode (J)J
+	public abstract fun encodeUnchecked (J)J
+	public abstract fun getSize ()J
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/LongIterator;
+	public abstract fun iterator (J)Lkotlin/collections/LongIterator;
+}
+
+public final class com/eignex/kpermute/LongPermutation$DefaultImpls {
+	public static fun decode (Lcom/eignex/kpermute/LongPermutation;J)J
+	public static fun encode (Lcom/eignex/kpermute/LongPermutation;J)J
+	public static fun iterator (Lcom/eignex/kpermute/LongPermutation;)Lkotlin/collections/LongIterator;
+}
+
+public final class com/eignex/kpermute/LongPermutationsKt {
+	public static final fun range (Lcom/eignex/kpermute/LongPermutation;Lkotlin/ranges/LongRange;)Lcom/eignex/kpermute/LongPermutation;
+}
+
+public final class com/eignex/kpermute/Permutations {
+	public static final fun intPermutation ()Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (I)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (IJ)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (IJI)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (ILkotlin/random/Random;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (ILkotlin/random/Random;I)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (J)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (Lkotlin/ranges/IntRange;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (Lkotlin/ranges/IntRange;JI)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (Lkotlin/ranges/IntRange;Lkotlin/random/Random;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (Lkotlin/ranges/IntRange;Lkotlin/random/Random;I)Lcom/eignex/kpermute/IntPermutation;
+	public static synthetic fun intPermutation$default (IJIILjava/lang/Object;)Lcom/eignex/kpermute/IntPermutation;
+	public static synthetic fun intPermutation$default (ILkotlin/random/Random;IILjava/lang/Object;)Lcom/eignex/kpermute/IntPermutation;
+	public static synthetic fun intPermutation$default (Lkotlin/ranges/IntRange;JIILjava/lang/Object;)Lcom/eignex/kpermute/IntPermutation;
+	public static synthetic fun intPermutation$default (Lkotlin/ranges/IntRange;Lkotlin/random/Random;IILjava/lang/Object;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun longPermutation ()Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (J)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (JJI)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (JLkotlin/random/Random;)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (JLkotlin/random/Random;I)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (Lkotlin/ranges/LongRange;)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (Lkotlin/ranges/LongRange;J)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (Lkotlin/ranges/LongRange;JI)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (Lkotlin/ranges/LongRange;Lkotlin/random/Random;)Lcom/eignex/kpermute/LongPermutation;
+	public static final fun longPermutation (Lkotlin/ranges/LongRange;Lkotlin/random/Random;I)Lcom/eignex/kpermute/LongPermutation;
+	public static synthetic fun longPermutation$default (JJIILjava/lang/Object;)Lcom/eignex/kpermute/LongPermutation;
+	public static synthetic fun longPermutation$default (JLkotlin/random/Random;IILjava/lang/Object;)Lcom/eignex/kpermute/LongPermutation;
+	public static synthetic fun longPermutation$default (Lkotlin/ranges/LongRange;JIILjava/lang/Object;)Lcom/eignex/kpermute/LongPermutation;
+	public static synthetic fun longPermutation$default (Lkotlin/ranges/LongRange;Lkotlin/random/Random;IILjava/lang/Object;)Lcom/eignex/kpermute/LongPermutation;
+}
+
+public final class com/eignex/kpermute/UIntPermutation : com/eignex/kpermute/IntPermutation {
+	public synthetic fun <init> (ILkotlin/random/Random;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILkotlin/random/Random;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (I)I
+	public fun decodeUnchecked (I)I
+	public fun encode (I)I
+	public fun encodeUnchecked (I)I
+	public fun getSize ()I
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/IntIterator;
+	public fun iterator (I)Lkotlin/collections/IntIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class com/eignex/kpermute/ULongPermutation : com/eignex/kpermute/LongPermutation {
+	public synthetic fun <init> (JLkotlin/random/Random;IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLkotlin/random/Random;IJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (J)J
+	public fun decodeUnchecked (J)J
+	public fun encode (J)J
+	public fun encodeUnchecked (J)J
+	public fun getSize ()J
+	public synthetic fun iterator ()Ljava/util/Iterator;
+	public fun iterator ()Lkotlin/collections/LongIterator;
+	public fun iterator (J)Lkotlin/collections/LongIterator;
+	public fun toString ()Ljava/lang/String;
+}
+
