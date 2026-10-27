@@ -108,7 +108,9 @@ final class com.eignex.kpermute/UIntPermutation : com.eignex.kpermute/IntPermuta
     final val size // com.eignex.kpermute/UIntPermutation.size|{}size[0]
         final fun <get-size>(): kotlin/Int // com.eignex.kpermute/UIntPermutation.size.<get-size>|<get-size>(){}[0]
 
+    final fun decode(kotlin/Int): kotlin/Int // com.eignex.kpermute/UIntPermutation.decode|decode(kotlin.Int){}[0]
     final fun decodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/UIntPermutation.decodeUnchecked|decodeUnchecked(kotlin.Int){}[0]
+    final fun encode(kotlin/Int): kotlin/Int // com.eignex.kpermute/UIntPermutation.encode|encode(kotlin.Int){}[0]
     final fun encodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/UIntPermutation.encodeUnchecked|encodeUnchecked(kotlin.Int){}[0]
     final fun iterator(kotlin/Int): kotlin.collections/IntIterator // com.eignex.kpermute/UIntPermutation.iterator|iterator(kotlin.Int){}[0]
     final fun toString(): kotlin/String // com.eignex.kpermute/UIntPermutation.toString|toString(){}[0]
@@ -120,7 +122,9 @@ final class com.eignex.kpermute/ULongPermutation : com.eignex.kpermute/LongPermu
     final val size // com.eignex.kpermute/ULongPermutation.size|{}size[0]
         final fun <get-size>(): kotlin/Long // com.eignex.kpermute/ULongPermutation.size.<get-size>|<get-size>(){}[0]
 
+    final fun decode(kotlin/Long): kotlin/Long // com.eignex.kpermute/ULongPermutation.decode|decode(kotlin.Long){}[0]
     final fun decodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/ULongPermutation.decodeUnchecked|decodeUnchecked(kotlin.Long){}[0]
+    final fun encode(kotlin/Long): kotlin/Long // com.eignex.kpermute/ULongPermutation.encode|encode(kotlin.Long){}[0]
     final fun encodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/ULongPermutation.encodeUnchecked|encodeUnchecked(kotlin.Long){}[0]
     final fun iterator(kotlin/Long): kotlin.collections/LongIterator // com.eignex.kpermute/ULongPermutation.iterator|iterator(kotlin.Long){}[0]
     final fun toString(): kotlin/String // com.eignex.kpermute/ULongPermutation.toString|toString(){}[0]

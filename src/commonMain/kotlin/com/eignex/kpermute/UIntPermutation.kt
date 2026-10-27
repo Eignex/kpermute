@@ -8,6 +8,8 @@ import kotlin.random.Random
  * Interprets values as `UInt` and permutes `[0, size)` using reversible affine
  * steps and XOR-shift mixing within a 2^k block. Cycle walking ensures that
  * all outputs stay inside the unsigned domain.
+ * [encode] and [decode] reject inputs whose unsigned representation is outside
+ * `[0, size.toUInt())`.
  *
  * @property [size] Size of the unsigned domain encoded as an `Int`.
  * @param [rng] Random generator used to derive per-round keys.
@@ -38,6 +40,20 @@ class UIntPermutation(
         kBits = k
         rshift = r
         invConst = PermMathUInt.invOdd32(const, mask)
+    }
+
+    override fun encode(value: Int): Int {
+        require(value.toUInt() < usize) {
+            "value ${value.toUInt()} out of range [0, $usize)"
+        }
+        return encodeUnchecked(value)
+    }
+
+    override fun decode(encoded: Int): Int {
+        require(encoded.toUInt() < usize) {
+            "encoded ${encoded.toUInt()} out of range [0, $usize)"
+        }
+        return decodeUnchecked(encoded)
     }
 
     override fun encodeUnchecked(value: Int): Int {
