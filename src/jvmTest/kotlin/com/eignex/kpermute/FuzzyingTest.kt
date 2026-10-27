@@ -11,7 +11,22 @@ class FuzzyingTest {
     private val innerIterations = 1_000
     private val rng = Random(42)
 
-    private fun choseIntPerm(): Triple<IntPermutation, Long, Int> {
+    // Int and Long permutations seen through unsigned 64-bit values.
+    private class FuzzCase(
+        val name: String,
+        val size: ULong,
+        val seed: Long,
+        val rounds: Int,
+        val encode: (ULong) -> ULong,
+        val decode: (ULong) -> ULong,
+        val iterator: (ULong) -> Iterator<ULong>,
+        val nextValue: () -> ULong,
+        val nextOffset: () -> ULong,
+    ) {
+        override fun toString() = "perm=$name size=$size rounds=$rounds seed=$seed"
+    }
+
+    private fun choseIntPerm(): FuzzCase {
         var size: Int
         do {
             size = when (rng.nextInt(4)) {
@@ -23,10 +38,34 @@ class FuzzyingTest {
         } while (size == 0)
         val rounds = rng.nextInt(2, 8)
         val seed = rng.nextLong()
-        return Triple(intPermutation(size, Random(seed), rounds), seed, rounds)
+        val perm = intPermutation(size, Random(seed), rounds)
+        val usize = size.toUInt()
+        return FuzzCase(
+            name = perm::class.simpleName!!,
+            size = usize.toULong(),
+            seed = seed,
+            rounds = rounds,
+            encode = { perm.encode(it.toInt()).toUInt().toULong() },
+            decode = { perm.decode(it.toInt()).toUInt().toULong() },
+            iterator = { offset ->
+                perm.iterator(offset.toInt()).asSequence().map { it.toUInt().toULong() }.iterator()
+            },
+            nextValue = {
+                val x = if (size > 0) rng.nextInt(size) else rng.nextUInt(0u, usize).toInt()
+                x.toUInt().toULong()
+            },
+            nextOffset = {
+                val offset = when {
+                    size > 0 -> rng.nextInt(size)
+                    size == -1 -> rng.nextInt()
+                    else -> rng.nextUInt(usize).toInt()
+                }
+                offset.toUInt().toULong()
+            },
+        )
     }
 
-    private fun choseLongPerm(): Triple<LongPermutation, Long, Int> {
+    private fun choseLongPerm(): FuzzCase {
         var size: Long
         do {
             size = when (rng.nextInt(4)) {
@@ -38,7 +77,27 @@ class FuzzyingTest {
         } while (size == 0L)
         val rounds = rng.nextInt(2, 8)
         val seed = rng.nextLong()
-        return Triple(longPermutation(size, Random(seed), rounds), seed, rounds)
+        val perm = longPermutation(size, Random(seed), rounds)
+        val usize = size.toULong()
+        return FuzzCase(
+            name = perm::class.simpleName!!,
+            size = usize,
+            seed = seed,
+            rounds = rounds,
+            encode = { perm.encode(it.toLong()).toULong() },
+            decode = { perm.decode(it.toLong()).toULong() },
+            iterator = { offset ->
+                perm.iterator(offset.toLong()).asSequence().map { it.toULong() }.iterator()
+            },
+            nextValue = { if (size > 0L) rng.nextLong(size).toULong() else rng.nextULong(0uL, usize) },
+            nextOffset = {
+                when {
+                    size > 0L -> rng.nextLong(size).toULong()
+                    size == -1L -> rng.nextLong().toULong()
+                    else -> rng.nextULong(usize)
+                }
+            },
+        )
     }
 
     // Abramowitz–Stegun 7.1.26
@@ -84,247 +143,85 @@ class FuzzyingTest {
         return meanTPValue(mean, expectedMean, variance, count)
     }
 
-    private fun runIntFuzzIterationUsingEncode(perm: IntPermutation, seed: Long, rounds: Int): Double {
+    private fun runFuzzIterationUsingEncode(c: FuzzCase): Double {
         val stats = Stats()
-        val size = perm.size
-        val usize = size.toUInt()
 
         repeat(innerIterations) {
-            val x = if (size > 0) {
-                rng.nextInt(size)
-            } else {
-                rng.nextUInt(0u, usize).toInt()
-            }
+            val x = c.nextValue()
+            val y = c.encode(x)
+            val z = c.decode(y)
+            assertEquals(x, z, "round-trip failed: $c x=$x y=$y z=$z")
 
-            val y = perm.encode(x)
-            val z = perm.decode(y)
-            assertEquals(
-                x,
-                z,
-                "round-trip failed: " +
-                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z",
-            )
-
-            val yu = y.toUInt()
-            val yf = yu.toDouble()
-            stats.update(yf)
-
-            assertTrue(
-                yu in 0u..<usize,
-                "support anomaly: perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed",
-            )
+            stats.update(y.toDouble())
+            assertTrue(y < c.size, "support anomaly: $c")
         }
 
-        val expectedMean = (usize.toDouble() - 1.0) / 2.0
-        return stats.pValue(expectedMean)
+        return stats.pValue((c.size.toDouble() - 1.0) / 2.0)
     }
 
-    private fun runIntFuzzIterationUsingIterator(perm: IntPermutation, seed: Long, rounds: Int): Double {
+    private fun runFuzzIterationUsingIterator(c: FuzzCase): Double {
         val stats = Stats()
-        val size = perm.size
-        val usize = size.toUInt()
 
-        val offset: Int =
-            when {
-                size > 0 -> rng.nextInt(size)
-                size == -1 -> rng.nextInt()
-                else -> rng.nextUInt(usize).toInt()
-            }
-
+        val offset = c.nextOffset()
         var i = offset
-        val it = perm.iterator(offset)
+        val it = c.iterator(offset)
 
         var taken = 0
         while (taken < innerIterations && it.hasNext()) {
-            val y = it.nextInt()
-            val x = perm.decode(y)
+            val y = it.next()
+            val x = c.decode(y)
 
-            assertEquals(
-                y,
-                perm.encode(i),
-                "iterator mismatch: " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y",
-            )
-            assertEquals(
-                i,
-                x,
-                "decode(encode(i)) mismatch via iterator: " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x",
-            )
+            assertEquals(y, c.encode(i), "iterator mismatch: $c offset=$offset i=$i y=$y")
+            assertEquals(i, x, "decode(encode(i)) mismatch via iterator: $c offset=$offset i=$i x=$x")
 
-            val yu = y.toUInt()
-            val yf = yu.toDouble()
-            stats.update(yf)
-
-            assertTrue(
-                yu in 0u..<usize,
-                "support anomaly via iterator: perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed",
-            )
+            stats.update(y.toDouble())
+            assertTrue(y < c.size, "support anomaly via iterator: $c")
 
             i++
             taken++
         }
 
-        val expectedMean = (usize.toDouble() - 1.0) / 2.0
-        return stats.pValue(expectedMean)
+        return stats.pValue((c.size.toDouble() - 1.0) / 2.0)
     }
 
-    private fun runIntFuzz(useIterator: Boolean) {
-        val pValuesByClass = mapOf<String, MutableList<Double>>(
-            SmallIntPermutation::class.simpleName!! to ArrayList(),
-            BoundedIntPermutation::class.simpleName!! to ArrayList(),
-            FullIntPermutation::class.simpleName!! to ArrayList(),
-        )
+    private fun runFuzz(label: String, classNames: List<String>, chose: () -> FuzzCase, useIterator: Boolean) {
+        val pValuesByClass = classNames.associateWith { ArrayList<Double>() }
 
         repeat(outerIterations) { outerIdx ->
-            val (perm, seed, rounds) = choseIntPerm()
-            val className = perm::class.simpleName!!
-
-            val pValue =
-                if (useIterator) {
-                    runIntFuzzIterationUsingIterator(
-                        perm,
-                        seed,
-                        rounds,
-                    )
-                } else {
-                    runIntFuzzIterationUsingEncode(perm, seed, rounds)
-                }
-
-            pValuesByClass.getValue(className).add(pValue)
+            val c = chose()
+            val pValue = if (useIterator) runFuzzIterationUsingIterator(c) else runFuzzIterationUsingEncode(c)
+            pValuesByClass.getValue(c.name).add(pValue)
 
             if (outerIdx % 1_000 == 0 && outerIdx > 0) {
                 val s = pValuesByClass.map {
                     "${it.key} = ${String.format(Locale.ENGLISH, "%.3f", it.value.average())}"
                 }.joinToString(", ")
-                println((if (useIterator) "[INT/ITER] " else "[INT/ENC] ") + s)
+                println("[$label/${if (useIterator) "ITER" else "ENC"}] $s")
             }
         }
     }
 
-    private fun runLongFuzzIterationUsingEncode(perm: LongPermutation, seed: Long, rounds: Int): Double {
-        val stats = Stats()
-        val size = perm.size
-        val usize = size.toULong()
+    private fun runIntFuzz(useIterator: Boolean) = runFuzz(
+        "INT",
+        listOf(
+            SmallIntPermutation::class.simpleName!!,
+            BoundedIntPermutation::class.simpleName!!,
+            FullIntPermutation::class.simpleName!!,
+        ),
+        ::choseIntPerm,
+        useIterator,
+    )
 
-        repeat(innerIterations) {
-            val x: Long =
-                if (size > 0L) {
-                    rng.nextLong(size)
-                } else {
-                    rng.nextULong(0uL, usize).toLong()
-                }
-
-            val y = perm.encode(x)
-            val z = perm.decode(y)
-
-            assertEquals(
-                x,
-                z,
-                "round-trip failed (Long): " +
-                    "size=$size rounds=$rounds seed=$seed x=$x y=$y z=$z perm=${perm::class.simpleName}",
-            )
-
-            val yu = y.toULong()
-            val yf = yu.toDouble()
-            stats.update(yf)
-
-            assertTrue(
-                yu in 0uL..<usize,
-                "support anomaly (Long): perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed",
-            )
-        }
-
-        val expectedMean = (usize.toDouble() - 1.0) / 2.0
-        return stats.pValue(expectedMean)
-    }
-
-    private fun runLongFuzzIterationUsingIterator(perm: LongPermutation, seed: Long, rounds: Int): Double {
-        val stats = Stats()
-        val size = perm.size
-        val usize = size.toULong()
-
-        val offset: Long =
-            when {
-                size > 0L -> rng.nextLong(size)
-                size == -1L -> rng.nextLong()
-                else -> rng.nextULong(usize).toLong()
-            }
-
-        var i = offset
-        val it = perm.iterator(offset)
-
-        var taken = 0
-        while (taken < innerIterations && it.hasNext()) {
-            val y = it.nextLong()
-            val x = perm.decode(y)
-
-            assertEquals(
-                y,
-                perm.encode(i),
-                "iterator mismatch (Long): " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i y=$y perm=${perm::class.simpleName}",
-            )
-            assertEquals(
-                i,
-                x,
-                "decode(encode(i)) mismatch via iterator (Long): " +
-                    "size=$size rounds=$rounds seed=$seed offset=$offset i=$i x=$x perm=${perm::class.simpleName}",
-            )
-
-            val yu = y.toULong()
-            val yf = yu.toDouble()
-            stats.update(yf)
-
-            assertTrue(
-                yu in 0uL..<usize,
-                "support anomaly via iterator (Long): perm=${perm::class.simpleName} size=$size " +
-                    "rounds=$rounds seed=$seed",
-            )
-
-            i++
-            taken++
-        }
-
-        val expectedMean = (usize.toDouble() - 1.0) / 2.0
-        return stats.pValue(expectedMean)
-    }
-
-    private fun runLongFuzz(useIterator: Boolean) {
-        val pValuesByClass = mapOf<String, MutableList<Double>>(
-            SmallLongPermutation::class.simpleName!! to ArrayList(),
-            BoundedLongPermutation::class.simpleName!! to ArrayList(),
-            FullLongPermutation::class.simpleName!! to ArrayList(),
-        )
-
-        repeat(outerIterations) { outerIdx ->
-            val (perm, seed, rounds) = choseLongPerm()
-            val className = perm::class.simpleName!!
-
-            val pValue =
-                if (useIterator) {
-                    runLongFuzzIterationUsingIterator(
-                        perm,
-                        seed,
-                        rounds,
-                    )
-                } else {
-                    runLongFuzzIterationUsingEncode(perm, seed, rounds)
-                }
-
-            pValuesByClass.getValue(className).add(pValue)
-
-            if (outerIdx % 1_000 == 0 && outerIdx > 0) {
-                val s = pValuesByClass.map {
-                    "${it.key} = ${String.format(Locale.ENGLISH, "%.3f", it.value.average())}"
-                }.joinToString(", ")
-                println((if (useIterator) "[LONG/ITER] " else "[LONG/ENC] ") + s)
-            }
-        }
-    }
+    private fun runLongFuzz(useIterator: Boolean) = runFuzz(
+        "LONG",
+        listOf(
+            SmallLongPermutation::class.simpleName!!,
+            BoundedLongPermutation::class.simpleName!!,
+            FullLongPermutation::class.simpleName!!,
+        ),
+        ::choseLongPerm,
+        useIterator,
+    )
 
     @Test
     fun roundTripWithStatsInt() {

@@ -11,6 +11,8 @@ private const val SMALL_MAX = 4096
 
 private fun defaultRounds(size: ULong): Int = if (size <= 1uL shl 20) 4 else 6
 
+private fun Int.orDefault(default: Int): Int = if (this == 0) default else this
+
 /**
  * Creates an [IntPermutation] over `[0, size)`.
  *
@@ -26,24 +28,9 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
     require(rounds >= 0) { "rounds must be >= 0" }
 
     return when {
-        size == -1 -> FullIntPermutation(
-            rng,
-            if (rounds == 0) 2 else rounds,
-        )
-
-        size < 0 -> BoundedIntPermutation(
-            size,
-            rng,
-            if (rounds == 0) defaultRounds(size.toUInt().toULong()) else rounds,
-        )
-
-        size <= SMALL_MAX -> SmallIntPermutation(size, rng)
-
-        else -> BoundedIntPermutation(
-            size,
-            rng,
-            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
-        )
+        size == -1 -> FullIntPermutation(rng, rounds.orDefault(2))
+        size in 0..SMALL_MAX -> SmallIntPermutation(size, rng)
+        else -> BoundedIntPermutation(size, rng, rounds.orDefault(defaultRounds(size.toUInt().toULong())))
     }
 }
 
@@ -68,7 +55,7 @@ fun intPermutation(range: IntRange, rng: Random = Random.Default, rounds: Int = 
         UInt.MAX_VALUE - 1u -> BoundedIntPermutation(
             -1,
             rng,
-            if (rounds == 0) defaultRounds(UInt.MAX_VALUE.toULong()) else rounds,
+            rounds.orDefault(defaultRounds(UInt.MAX_VALUE.toULong())),
         )
 
         else -> intPermutation((lastIndex + 1u).toInt(), rng, rounds)
@@ -96,15 +83,12 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
     require(rounds >= 0) { "rounds must be >= 0" }
 
     return when {
-        size == -1L -> FullLongPermutation(
-            rng,
-            if (rounds == 0) 2 else rounds,
-        )
+        size == -1L -> FullLongPermutation(rng, rounds.orDefault(2))
 
         size < 0L -> BoundedLongPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
+            rounds.orDefault(defaultRounds(size.toULong())),
         )
 
         size <= SMALL_MAX -> SmallLongPermutation(size, rng)
@@ -113,7 +97,7 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
         else -> BoundedLongPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
+            rounds.orDefault(defaultRounds(size.toULong())),
             0x52A531B54E4EC5CBuL,
         )
     }
@@ -139,7 +123,7 @@ fun longPermutation(range: LongRange, rng: Random = Random.Default, rounds: Int 
         ULong.MAX_VALUE - 1uL -> BoundedLongPermutation(
             -1L,
             rng,
-            if (rounds == 0) defaultRounds(ULong.MAX_VALUE) else rounds,
+            rounds.orDefault(defaultRounds(ULong.MAX_VALUE)),
         )
 
         else -> longPermutation((lastIndex + 1uL).toLong(), rng, rounds)
