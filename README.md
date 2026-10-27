@@ -72,25 +72,12 @@ The size selects the domain 0 until size. A size of -1 means every 32- or
 64-bit value, and other negative sizes are read as unsigned.
 
 Sizes up to 4096 use a shuffled lookup table. Larger sizes mix within the
-enclosing power-of-two block and use cycle-walking [1] [2], repeating until the
-output is in range. The full 32- or 64-bit domain mixes directly. Range
+enclosing power-of-two block and use
+[cycle-walking](https://web.cs.ucdavis.edu/~rogaway/papers/subset.pdf),
+repeating until the output is in range. The full 32- or 64-bit domain mixes directly. Range
 factories wrap any of these in a view over a non-empty range.
 
 Each mixing round multiplies by an odd constant, adds or xors a per-round key,
-and xor-shifts the value right. Every step is invertible [1] [3].
-
-## References
-
-[1]: https://web.cs.ucdavis.edu/~rogaway/papers/subset.pdf
-
-[2]: https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/proposed-modes/ffx/ffx-spec.pdf
-
-[3]: http://burtleburtle.net/bob/hash/integer.html
-
-1. P. Rogaway and T. Shrimpton,
-   “Ciphers with Arbitrary Finite Domains,” *CT-RSA 2002*. [PDF][1]
-2. M. Bellare, P. Rogaway, and T. Spies,
-   “The FFX Mode of Operation for Format-Preserving Encryption,” *NIST
-   submission, 2010.* [Spec][2]
-3. B. Jenkins,
-   “Integer Hash Functions,” 1997. [Web][3]
+and xor-shifts the value right, in the style of
+[Jenkins' integer hashes](http://burtleburtle.net/bob/hash/integer.html).
+Every step is invertible.
