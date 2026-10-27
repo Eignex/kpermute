@@ -237,6 +237,7 @@ fun longPermutation(size: Long = Long.MAX_VALUE, seed: Long, rounds: Int = 0): L
  */
 @JvmOverloads
 fun longPermutation(range: LongRange, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {
+    require(!range.isEmpty()) { "range must be non-empty and increasing: $range" }
     val nULong = range.last.toULong() - range.first.toULong() + 1uL
     require(nULong > 0uL) {
         "range must be non-empty and increasing: $range"

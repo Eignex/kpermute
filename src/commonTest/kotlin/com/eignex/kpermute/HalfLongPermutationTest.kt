@@ -8,7 +8,7 @@ class HalfLongPermutationTest {
 
     @Test
     fun bijectionVariousSizes() {
-        for (n in listOf(5L, 31L, 64L, 128L)) {
+        for (n in listOf(1L, 2L, 3L, 4L, 5L, 31L, 64L, 128L)) {
             val p = HalfLongPermutation(n, Random(7))
             CommonAssertsLong.assertBijectionOverDomain(p, n)
         }

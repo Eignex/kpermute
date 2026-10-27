@@ -296,4 +296,21 @@ class LongPermutationsTest {
             assertEquals(originalValues, original.toList())
         }
     }
+
+    @Test
+    fun rejectsEmptyAndOverflowingRangeDomains() {
+        val ranges = listOf(
+            LongRange(10L, 5L),
+            LongRange(5L, 4L),
+            Long.MAX_VALUE..Long.MIN_VALUE,
+            Long.MIN_VALUE..Long.MAX_VALUE,
+            0L..Long.MAX_VALUE,
+        )
+        for (range in ranges) {
+            assertFailsWith<IllegalArgumentException> { longPermutation(range, seed = 1L) }
+            for (size in listOf(0L, 2L)) {
+                assertFailsWith<IllegalArgumentException> { longPermutation(size, seed = 1L).range(range) }
+            }
+        }
+    }
 }

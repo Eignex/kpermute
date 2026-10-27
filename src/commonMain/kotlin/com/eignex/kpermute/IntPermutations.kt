@@ -37,7 +37,7 @@ fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
 
 /**
  * Returns a view of this permutation that operates on [range].
- * Only valid for finite domains where `range.count() == size`.
+ * Requires a non-empty range with the same size as this finite permutation.
  * Calling this on an existing range view replaces its range while preserving
  * the underlying permutation.
  *
@@ -45,9 +45,10 @@ fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
  * sliding windows, or bounded ID segments without manual offset math.
  */
 fun IntPermutation.range(range: IntRange): IntPermutation {
-    val n = range.last - range.first + 1
+    require(!range.isEmpty()) { "range must be non-empty: $range" }
+    val n = range.last.toLong() - range.first.toLong() + 1L
     require(size >= 0) { "range() requires a finite base permutation" }
-    require(size == n) { "base size ($size) must equal range length ($n)" }
+    require(size.toLong() == n) { "base size ($size) must equal range length ($n)" }
 
     val base = if (this is IntRangePermutation) this.base else this
     return IntRangePermutation(base, range)

@@ -7,7 +7,7 @@ import kotlin.test.assertFailsWith
 class HalfIntPermutationTest {
     @Test
     fun bijectionVariousSizes() {
-        for (n in listOf(5, 31, 64, 128)) {
+        for (n in listOf(1, 2, 3, 4, 5, 31, 64, 128)) {
             val p = HalfIntPermutation(n, Random(7))
             CommonAssertsInt.assertBijectionOverDomain(p, n)
         }

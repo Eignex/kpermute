@@ -46,14 +46,13 @@ class FullIntPermutationTest {
     @Test
     fun iteratorOverflowTerminates() {
         val p = FullIntPermutation(Random(2))
-        // Start close to UInt.MAX_VALUE so Int overflow reaches -1 quickly.
-        val start = UInt.MAX_VALUE.toInt() - 5
-        val it = p.iterator(start)
-        val list = it.asSequence().toList()
-        assertEquals(5, list.size)
-        val expected = ((UInt.MAX_VALUE - 5u) until UInt.MAX_VALUE)
-            .map { p.encode(it.toInt()) }
-        assertEquals(expected, list)
+        for (start in listOf(-6, -1)) {
+            val iterator = p.iterator(start)
+            val expected = (start..-1).map { p.encode(it) }
+            assertEquals(expected, iterator.asSequence().toList())
+            assertFalse(iterator.hasNext())
+            assertFailsWith<NoSuchElementException> { iterator.nextInt() }
+        }
     }
 
     @Test
@@ -61,7 +60,7 @@ class FullIntPermutationTest {
         val p = FullIntPermutation(Random(1))
         val start = UInt.MAX_VALUE.toInt() - 3
         val itr = p.iterator(start)
-        repeat(3) { itr.nextInt() }
+        repeat(4) { itr.nextInt() }
         assertFailsWith<NoSuchElementException> { itr.nextInt() }
     }
 }

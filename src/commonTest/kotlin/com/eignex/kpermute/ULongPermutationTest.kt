@@ -8,7 +8,7 @@ class ULongPermutationTest {
 
     @Test
     fun bijectionVariousSizes() {
-        for (n in listOf(7L, 15L, 64L, 1000L)) {
+        for (n in listOf(1L, 2L, 3L, 4L, 7L, 15L, 64L, 1000L)) {
             val p = ULongPermutation(n, Random(55))
             CommonAssertsLong.assertBijectionOverDomain(p, n)
         }

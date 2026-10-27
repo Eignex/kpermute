@@ -2,7 +2,7 @@ package com.eignex.kpermute
 
 /**
  * Returns a view of this permutation that operates on [range].
- * Only valid for finite domains where `range.count() == size`.
+ * Requires a non-empty range with the same size as this finite permutation.
  * Calling this on an existing range view replaces its range while preserving
  * the underlying permutation.
  *
@@ -10,9 +10,10 @@ package com.eignex.kpermute
  * sliding windows, or bounded ID segments without manual offset math.
  */
 fun LongPermutation.range(range: LongRange): LongPermutation {
-    val n = range.last - range.first + 1L
+    require(!range.isEmpty()) { "range must be non-empty: $range" }
+    val n = range.last.toULong() - range.first.toULong() + 1uL
     require(size >= 0L) { "range() requires a finite base permutation" }
-    require(size == n) { "base size ($size) must equal range length ($n)" }
+    require(n != 0uL && size.toULong() == n) { "base size ($size) must equal range length ($n)" }
 
     val base = if (this is LongRangePermutation) this.base else this
     return LongRangePermutation(base, range)

@@ -348,4 +348,21 @@ class IntPermutationsTest {
             assertEquals(originalValues, original.toList())
         }
     }
+
+    @Test
+    fun rejectsEmptyAndOverflowingRangeDomains() {
+        val ranges = listOf(
+            IntRange(10, 5),
+            IntRange(5, 4),
+            Int.MAX_VALUE..Int.MIN_VALUE,
+            Int.MIN_VALUE..Int.MAX_VALUE,
+            0..Int.MAX_VALUE,
+        )
+        for (range in ranges) {
+            assertFailsWith<IllegalArgumentException> { intPermutation(range, seed = 1L) }
+            for (size in listOf(0, 2)) {
+                assertFailsWith<IllegalArgumentException> { intPermutation(size, seed = 1L).range(range) }
+            }
+        }
+    }
 }
