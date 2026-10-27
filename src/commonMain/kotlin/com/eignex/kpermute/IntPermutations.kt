@@ -52,7 +52,8 @@ private fun checkIndex(index: Int, n: Int): Int {
 
 /**
  * Returns a view of this permutation that operates on [range].
- * Requires a non-empty range with the same size as this finite permutation.
+ * Requires a non-empty range with the same number of values as this
+ * permutation's domain, which may be unsigned or the full 32-bit space.
  * Calling this on an existing range view replaces its range while preserving
  * the underlying permutation.
  *
@@ -61,17 +62,28 @@ private fun checkIndex(index: Int, n: Int): Int {
  */
 fun IntPermutation.range(range: IntRange): IntPermutation {
     require(!range.isEmpty()) { "range must be non-empty: $range" }
-    val n = range.last.toLong() - range.first.toLong() + 1L
-    require(size >= 0) { "range() requires a finite base permutation" }
-    require(size.toLong() == n) { "base size ($size) must equal range length ($n)" }
+    require(size != 0) { "range() requires a non-empty base permutation" }
+    val lastIndex = range.last.toUInt() - range.first.toUInt()
+    require(lastIndex() == lastIndex) {
+        "base size (${lastIndex().toLong() + 1L}) must equal range length (${lastIndex.toLong() + 1L})"
+    }
 
     val base = if (this is IntRangePermutation) this.base else this
     return IntRangePermutation(base, range)
 }
 
+// Largest index of a non-empty domain; size -1 is the full domain unless it is
+// a bounded permutation, where it means 2^32 - 1 values.
+private fun IntPermutation.lastIndex(): UInt = when {
+    this is IntRangePermutation -> lastIndex
+    size == -1 && this !is BoundedIntPermutation -> UInt.MAX_VALUE
+    else -> size.toUInt() - 1u
+}
+
 private class IntRangePermutation(val base: IntPermutation, private val range: IntRange) : IntPermutation {
     override val size: Int = base.size
     val start = range.first
+    val lastIndex: UInt = range.last.toUInt() - range.first.toUInt()
 
     override fun encodeUnchecked(value: Int): Int = start + base.encodeUnchecked(value - start)
 
@@ -87,15 +99,19 @@ private class IntRangePermutation(val base: IntPermutation, private val range: I
         return decodeUnchecked(encoded)
     }
 
-    // Offsets are indices in 0..size, independent of the range's start.
+    // Offsets are unsigned indices in 0..size, independent of the range's start.
     override fun iterator(offset: Int): IntIterator {
-        require(offset in 0..size) { "offset $offset out of [0, $size]" }
-        var i = offset
+        var i = offset.toUInt()
+        require(lastIndex == UInt.MAX_VALUE || i <= lastIndex + 1u) {
+            "offset $i out of range [0, ${lastIndex.toLong() + 1L}]"
+        }
+        var exhausted = i > lastIndex
         return object : IntIterator() {
-            override fun hasNext() = i < size
+            override fun hasNext() = !exhausted
             override fun nextInt(): Int {
                 if (!hasNext()) throw NoSuchElementException()
-                return start + base.encodeUnchecked(i++)
+                exhausted = i == lastIndex
+                return start + base.encodeUnchecked((i++).toInt())
             }
         }
     }

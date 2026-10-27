@@ -34,13 +34,13 @@ class IntPermutationsTest {
         )
         assertTrue(
             intPermutation(
-                size = 16,
+                size = 4096,
                 rng = Random(1),
             ) is SmallIntPermutation,
         )
         assertTrue(
             intPermutation(
-                size = 17,
+                size = 4097,
                 rng = Random(1),
             ) is BoundedIntPermutation,
         )
@@ -48,14 +48,8 @@ class IntPermutationsTest {
 
     @Test
     fun intFactoryDefaultRoundsForHalfAllSizeBands() {
-        // <= 2^10 branch
-        val small = 600 // > 16 and <= 2^10
-        val pSmall = intPermutation(size = small, rng = Random(1), rounds = 0)
-        assertEquals(small, pSmall.size)
-        assertTrue(pSmall is BoundedIntPermutation)
-
-        // (2^10, 2^20] branch
-        val medium = (1 shl 10) + 100
+        // (4096, 2^20] branch
+        val medium = 5000
         val pMedium = intPermutation(size = medium, rng = Random(2), rounds = 0)
         assertEquals(medium, pMedium.size)
         assertTrue(pMedium is BoundedIntPermutation)
@@ -69,7 +63,7 @@ class IntPermutationsTest {
 
     @Test
     fun intFactoryUsesExplicitRoundsWhenNonZero() {
-        val p = intPermutation(size = 128, rng = Random(4), rounds = 5)
+        val p = intPermutation(size = 5000, rng = Random(4), rounds = 5)
         assertTrue(p is BoundedIntPermutation)
         val x = 42
         assertEquals(x, p.decode(p.encode(x)))
@@ -108,7 +102,7 @@ class IntPermutationsTest {
     @Test
     fun selectsImplementationBySize() {
         assertTrue(intPermutation(8) is SmallIntPermutation)
-        assertTrue(intPermutation(17) is BoundedIntPermutation)
+        assertTrue(intPermutation(4097) is BoundedIntPermutation)
         assertTrue(intPermutation(-1) is FullIntPermutation)
         assertTrue(intPermutation(-10) is BoundedIntPermutation)
     }
@@ -137,8 +131,8 @@ class IntPermutationsTest {
 
     @Test
     fun respectsRoundsParameterAcrossFactory() {
-        val p1 = intPermutation(64, seed = 123, rounds = 1)
-        val p2 = intPermutation(64, seed = 123, rounds = 5)
+        val p1 = intPermutation(5000, seed = 123, rounds = 1)
+        val p2 = intPermutation(5000, seed = 123, rounds = 5)
         CommonAssertsInt.assertDifferentMapping(p1, p2, sample = 10)
     }
 
@@ -355,11 +349,11 @@ class IntPermutationsTest {
             IntRange(10, 5),
             IntRange(5, 4),
             Int.MAX_VALUE..Int.MIN_VALUE,
-            Int.MIN_VALUE..Int.MAX_VALUE,
-            0..Int.MAX_VALUE,
         )
         for (range in ranges) {
             assertFailsWith<IllegalArgumentException> { intPermutation(range, seed = 1L) }
+        }
+        for (range in ranges + listOf(Int.MIN_VALUE..Int.MAX_VALUE, 0..Int.MAX_VALUE)) {
             for (size in listOf(0, 2)) {
                 assertFailsWith<IllegalArgumentException> { intPermutation(size, seed = 1L).range(range) }
             }
@@ -369,18 +363,18 @@ class IntPermutationsTest {
     @Test
     fun factoryOutputsAreStableAcrossReleases() {
         val expected = mapOf(
-            (17 to 42L) to listOf(16, 2, 3, 6, 4, 11, 8, 13),
-            (1000 to 7L) to listOf(871, 437, 599, 344, 151, 37, 562, 946),
-            (1_000_003 to 123L) to listOf(837632, 718097, 569769, 516486, 624585, 984698, 546467, 601712),
+            (17 to 42L) to listOf(7, 12, 3, 2, 15, 1, 10, 9),
+            (1000 to 7L) to listOf(304, 614, 929, 344, 161, 36, 335, 151),
+            (1_000_003 to 123L) to listOf(906634, 276910, 46134, 862978, 89845, 810813, 608686, 882166),
             (Int.MAX_VALUE to 1L) to listOf(
-                341430956,
-                165841731,
-                1848863319,
-                1956760551,
-                1513048613,
-                463180597,
-                9287647,
-                191457700,
+                258432863,
+                1170790071,
+                1756570113,
+                527780029,
+                288931797,
+                2033609779,
+                54382987,
+                1857887325,
             ),
         )
         for ((key, values) in expected) {

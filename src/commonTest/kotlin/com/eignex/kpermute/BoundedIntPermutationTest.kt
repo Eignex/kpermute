@@ -129,4 +129,12 @@ class BoundedIntPermutationTest {
         assertTrue(unsigned.iterator(-3).hasNext())
         assertFailsWith<IllegalArgumentException> { unsigned.iterator(-1) }
     }
+
+    @Test
+    fun smallSeedsWithSharedLowKeyBitsGiveDistinctPermutations() {
+        // Random(4526) and Random(8192) emit keys that share their low 8 bits.
+        val a = BoundedIntPermutation(100, Random(4526L))
+        val b = BoundedIntPermutation(100, Random(8192L))
+        assertNotEquals(a.toList(), b.toList())
+    }
 }

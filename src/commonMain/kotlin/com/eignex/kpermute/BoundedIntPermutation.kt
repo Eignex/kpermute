@@ -43,8 +43,10 @@ class BoundedIntPermutation(
         invConst = PermMathUInt.invOdd32(const, mask)
     }
 
-    // Declared after init so invalid rounds fail its require first.
-    private val keys: UIntArray = UIntArray(rounds) { rng.nextInt().toUInt() }
+    // Declared after init so invalid rounds fail its require first. Keys take
+    // the high bits of nextInt, since the low bits of Random(seed) outputs
+    // collide across small seeds and only kBits of each key are used.
+    private val keys: UIntArray = UIntArray(rounds) { rng.nextInt().toUInt() shr (32 - kBits) }
 
     // Overrides the interface check, which treats size == -1 as the full
     // domain; here -1 means 2^32 - 1 values like any other unsigned size.
