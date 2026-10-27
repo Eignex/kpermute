@@ -9,12 +9,16 @@ fun LongPermutation.range(range: LongRange): LongPermutation {
     require(size != 0L) { "range() requires a non-empty base permutation" }
     val lastIndex = range.last.toULong() - range.first.toULong()
     require(lastIndex() == lastIndex) {
-        "base size (${lastIndex() + 1uL}) must equal range length (${lastIndex + 1uL})"
+        "base size (${countString(lastIndex())}) must equal range length (${countString(lastIndex)})"
     }
 
     val base = if (this is LongRangePermutation) this.base else this
     return LongRangePermutation(base, range)
 }
+
+// lastIndex + 1 overflows ULong for the full domain.
+private fun countString(lastIndex: ULong): String =
+    if (lastIndex == ULong.MAX_VALUE) "18446744073709551616" else (lastIndex + 1uL).toString()
 
 // Bounded permutations use size -1 for 2^64 - 1 values, not the full domain.
 private fun LongPermutation.lastIndex(): ULong = when {
@@ -58,4 +62,6 @@ private class LongRangePermutation(val base: LongPermutation, private val range:
             }
         }
     }
+
+    override fun toString(): String = "LongRangePermutation(range=$range, base=$base)"
 }

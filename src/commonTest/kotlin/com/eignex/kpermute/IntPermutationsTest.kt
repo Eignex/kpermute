@@ -412,4 +412,10 @@ class IntPermutationsTest {
             assertFailsWith<IndexOutOfBoundsException> { view[20] }
         }
     }
+
+    @Test
+    fun rangeViewToString() {
+        val p = intPermutation(5..9, seed = 1L)
+        assertEquals("IntRangePermutation(range=5..9, base=SmallIntPermutation(size=5))", p.toString())
+    }
 }
