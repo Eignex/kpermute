@@ -48,13 +48,11 @@ class IntPermutationsTest {
 
     @Test
     fun intFactoryDefaultRoundsForHalfAllSizeBands() {
-        // (4096, 2^20] branch
         val medium = 5000
         val pMedium = intPermutation(size = medium, rng = Random(2), rounds = 0)
         assertEquals(medium, pMedium.size)
         assertTrue(pMedium is BoundedIntPermutation)
 
-        // > 2^20 branch
         val large = (1 shl 20) + 100
         val pLarge = intPermutation(size = large, rng = Random(3), rounds = 0)
         assertEquals(large, pLarge.size)
@@ -169,8 +167,7 @@ class IntPermutationsTest {
         assertEquals(list.toSet().size, 5)
     }
 
-    // A three-cycle has different forward and inverse mappings, so swapping
-    // encode/decode cannot pass just because both views still round-trip.
+    // A three-cycle differs from its inverse, so swapped encode/decode would fail.
     private val cycle = object : IntPermutation {
         override val size = 3
         override fun encodeUnchecked(value: Int) = intArrayOf(1, 2, 0)[value]
@@ -386,7 +383,6 @@ class IntPermutationsTest {
 
     @Test
     fun intFactoryUsesLargestDefaultRoundsForUnsignedSizes() {
-        // Unsigned sizes are always above 2^31, so they get the top band.
         for (size in listOf(-2, -10, -((1 shl 16) + 100), Int.MIN_VALUE)) {
             val p = intPermutation(size = size, rng = Random(1), rounds = 0)
             val expected = intPermutation(size = size, rng = Random(1), rounds = 6)

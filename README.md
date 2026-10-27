@@ -15,18 +15,9 @@
 [![codecov](https://codecov.io/gh/eignex/kpermute/branch/main/graph/badge.svg)](https://codecov.io/gh/eignex/kpermute)
 [![License](https://img.shields.io/github/license/eignex/kpermute)](https://github.com/eignex/kpermute/blob/main/LICENSE)
 
-KPermute generates fast, deterministic, reversible integer permutations over
-arbitrary integer domains using bijective hash mixing.
-
-## Overview
-
-Each seed defines a unique bijection over `[0, size)`. The result behaves like
-a keyed shuffle: repeatable, memory-efficient, and invertible.
-
-Typical uses are obfuscating numeric IDs (such as user or session numbers),
-generating reproducible pseudo-random shuffles, collision-free sampling and
-load balancing, and masking non-sensitive identifiers. It is not a cryptographic
-primitive; if your use case is cryptographic, choose a real cipher.
+Fast, seeded, reversible permutations over integer domains of any size. Use
+it to obfuscate IDs, shuffle lazily, or sample without collisions. Not
+cryptographic.
 
 ### Installation
 
@@ -36,7 +27,7 @@ implementation("com.eignex:kpermute:1.2.0")
 
 ## Usage
 
-Obfuscate a numeric ID reproducibly:
+Obfuscate an ID:
 
 ```kotlin
 val idPerm = longPermutation(seed = 1L)
@@ -45,7 +36,7 @@ val encoded = idPerm.encode(longId)
 println("encoded: $encoded (always prints 3631103739497407856)")
 ```
 
-Shuffle a large list lazily:
+Shuffle a list lazily:
 
 ```kotlin
 val largeList = object : AbstractList<Int>() {
@@ -59,7 +50,7 @@ val unshuffled = shuffled.unpermuted(perm)
 println("unshuffled: ${unshuffled.take(20)}")
 ```
 
-Permute a custom range, including negatives:
+Permute a range:
 
 ```kotlin
 val rangePerm = intPermutation(-100..199)
@@ -75,34 +66,24 @@ println(fullPerm.encode(0)) // 1789640036
 println(fullPerm.encode(1)) // -299069089
 ```
 
----
-
 ## How It Works
 
-KPermute builds keyed, reversible permutations over integer domains using
-xor-shift-multiply mixers and cycle-walking. It never stores lookup tables, and
-every output decodes back to its original value.
+`size` selects the domain `[0, size)`. `-1` means every 32- or 64-bit value;
+other negative sizes are read as unsigned.
 
-A permutation is selected by its size. A positive size means a finite domain
-`[0, size)`. A size of `-1` or `-1L` means the full 32- or 64-bit signed
-domain. Other negative sizes are read as unsigned, so domains larger than the
-signed maximum are also supported.
+| Domain        | Implementation                 | Method                    |
+|---------------|--------------------------------|---------------------------|
+| ≤ 4096        | `Small[Int/Long]Permutation`   | Shuffled lookup table     |
+| Finite        | `Bounded[Int/Long]Permutation` | Mixing with cycle-walking |
+| Full width    | `Full[Int/Long]Permutation`    | Mixing                    |
 
-| Domain Type    | Implementation                 | Description                     |
-|----------------|--------------------------------|---------------------------------|
-| Small (≤4096)  | `Small[Int/Long]Permutation`   | Uses shuffled array and inverse |
-| Finite         | `Bounded[Int/Long]Permutation` | Uses cycle-walking              |
-| Full bit-width | `Full[Int/Long]Permutation`    | No cycle-walking                |
+Range factories such as `intPermutation(-100..199)` wrap these in a view over
+any non-empty range.
 
-Range factories like `intPermutation(range)` and `longPermutation(range)` wrap
-these with a range view, so you can permute directly on intervals such as
-`-100..199`. Any non-empty range works, up to the full `Int` or `Long` range.
-
-Each round multiplies by an odd constant, adds or xors a secret per-round key,
-and applies xor-shift steps (`x ^= x >>> s`) to diffuse bits. Every step is
-invertible via modular inverses and xor-shift inversion [1] [3]. For
-non-power-of-two domains KPermute uses cycle-walking [1] [2]: permute in the
-next power-of-two space and retry until the output falls in `[0, size)`.
+Each mixing round multiplies by an odd constant, adds or xors a per-round key,
+and applies `x ^= x >>> s`; every step is invertible [1] [3]. For
+non-power-of-two sizes, cycle-walking [1] [2] permutes the enclosing
+power-of-two block and repeats until the output is in range.
 
 ## References
 

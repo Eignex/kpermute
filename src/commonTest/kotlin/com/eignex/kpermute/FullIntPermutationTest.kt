@@ -36,7 +36,6 @@ class FullIntPermutationTest {
     @Test
     fun deterministicForSameSeed() {
         val factory = { FullIntPermutation(Random(1234), rounds = 2) }
-        // Only sample a small set because domain is all Int
         val p1 = factory()
         val p2 = factory()
         val samples = listOf(0, 1, 2, 100, -1, Int.MAX_VALUE, Int.MIN_VALUE)
