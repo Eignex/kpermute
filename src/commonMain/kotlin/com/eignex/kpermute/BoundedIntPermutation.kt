@@ -3,21 +3,22 @@ package com.eignex.kpermute
 import kotlin.random.Random
 
 /**
- * Finite permutation over an unsigned 32-bit-style domain encoded as `Int`.
+ * Finite permutation over `[0, size)` using cycle-walking over a 2^k block.
  *
- * Interprets values as `UInt` and permutes `[0, size)` using reversible affine
- * steps and XOR-shift mixing within a 2^k block. Cycle walking ensures that
- * all outputs stay inside the unsigned domain.
+ * Applies reversible affine steps and XOR-shift mixing within the smallest
+ * power-of-two block containing the domain, and walks outputs outside
+ * `[0, size)` until they fall back inside. [size] is read as unsigned, so
+ * negative values select domains larger than the signed Int maximum.
  * [encode] and [decode] reject inputs whose unsigned representation is outside
  * `[0, size.toUInt())`.
  *
- * @property [size] Size of the unsigned domain encoded as an `Int`.
+ * @property [size] Domain size, read as an unsigned 32-bit value.
  * @param [rng] Random generator used to derive per-round keys.
  * @param [rounds] Number of mixing rounds; higher values increase dispersion.
  * @param [const] Odd multiplicative constant used in each affine step.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-class UIntPermutation(
+class BoundedIntPermutation(
     override val size: Int,
     rng: Random = Random.Default,
     private val rounds: Int = 3,
@@ -32,6 +33,7 @@ class UIntPermutation(
     private val invConst: UInt
 
     init {
+        require(usize != 0u) { "size must be != 0" }
         require(rounds > 0) { "rounds must be > 0" }
         require(const % 2u == 1u) { "const must be odd" }
 
@@ -91,5 +93,5 @@ class UIntPermutation(
         }
     }
 
-    override fun toString(): String = "UIntPermutation(size=$size)"
+    override fun toString(): String = "BoundedIntPermutation(size=$size)"
 }

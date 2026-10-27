@@ -4,12 +4,12 @@ import kotlin.random.Random
 import kotlin.test.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class UIntPermutationTest {
+class BoundedIntPermutationTest {
 
     @Test
     fun bijectionVariousSizes() {
         for (n in listOf(1, 2, 3, 4, 7, 15, 64, 1000)) {
-            val p = UIntPermutation(n, Random(55))
+            val p = BoundedIntPermutation(n, Random(55))
             CommonAssertsInt.assertBijectionOverDomain(p, n)
         }
     }
@@ -17,7 +17,7 @@ class UIntPermutationTest {
     @Test
     fun iteratorFullAndOffsetsEdgeCases() {
         val n = 5
-        val p = UIntPermutation(n, Random(1))
+        val p = BoundedIntPermutation(n, Random(1))
         // full
         CommonAssertsInt.assertIteratorMatchesEncode(p, n)
         // offset == last index → one element then end
@@ -35,24 +35,24 @@ class UIntPermutationTest {
     @Test
     fun deterministicForSameSeed() {
         val n = 20
-        val factory = { UIntPermutation(n, Random(9)) }
+        val factory = { BoundedIntPermutation(n, Random(9)) }
         CommonAssertsInt.assertDeterministic(factory)
     }
 
     @Test
     fun roundsAndConstConstraintsAndVariation() {
         assertFailsWith<IllegalArgumentException> {
-            UIntPermutation(32, Random(1), const = 4u)
+            BoundedIntPermutation(32, Random(1), const = 4u)
         }
-        val p1 = UIntPermutation(128, Random(5), rounds = 1)
-        val p2 = UIntPermutation(128, Random(5), rounds = 5)
+        val p1 = BoundedIntPermutation(128, Random(5), rounds = 1)
+        val p2 = BoundedIntPermutation(128, Random(5), rounds = 5)
         CommonAssertsInt.assertDifferentMapping(p1, p2)
     }
 
     @Test
     fun rejectsOutOfRange() {
         val n = 10
-        val p = UIntPermutation(n, Random(1))
+        val p = BoundedIntPermutation(n, Random(1))
         CommonAssertsInt.assertRangeChecks(p, n)
     }
 
@@ -60,7 +60,7 @@ class UIntPermutationTest {
     fun unsignedIntDomainsPreserveValuesOnBothSidesOfTheSignBit() {
         for (size in listOf(Int.MIN_VALUE, Int.MIN_VALUE + 1, -2)) {
             for (seed in listOf(0L, 42L, Long.MIN_VALUE)) {
-                val perm = UIntPermutation(size, Random(seed))
+                val perm = BoundedIntPermutation(size, Random(seed))
                 val samples = listOf(0, 1, Int.MAX_VALUE - 1, Int.MAX_VALUE, Int.MIN_VALUE, size - 1)
                     .filter { it.toUInt() < size.toUInt() }
                 for (value in samples) {
@@ -87,7 +87,7 @@ class UIntPermutationTest {
     @Test
     fun rejectsOutOfRangeForUnsignedSizes() {
         for (size in listOf(Int.MIN_VALUE, Int.MIN_VALUE + 1, -10, -2, -1)) {
-            val permutations = mutableListOf<IntPermutation>(UIntPermutation(size, Random(1)))
+            val permutations = mutableListOf<IntPermutation>(BoundedIntPermutation(size, Random(1)))
             if (size != -1) permutations += intPermutation(size, seed = 1L)
             for (p in permutations) {
                 for (invalid in listOf(size, -1).distinct()) {
@@ -105,5 +105,10 @@ class UIntPermutationTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun rejectsZeroSize() {
+        assertFailsWith<IllegalArgumentException> { BoundedIntPermutation(0, Random(1)) }
     }
 }

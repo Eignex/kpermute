@@ -62,25 +62,25 @@ class LongPermutationsTest {
             longPermutation(
                 size = -5L,
                 rng = Random(1),
-            ) is ULongPermutation,
+            ) is BoundedLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 0L,
                 rng = Random(1),
-            ) is ArrayLongPermutation,
+            ) is SmallLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 16L,
                 rng = Random(1),
-            ) is ArrayLongPermutation,
+            ) is SmallLongPermutation,
         )
         assertTrue(
             longPermutation(
                 size = 17L,
                 rng = Random(1),
-            ) is HalfLongPermutation,
+            ) is BoundedLongPermutation,
         )
     }
 
@@ -90,20 +90,20 @@ class LongPermutationsTest {
         val small = 600L
         val pSmall = longPermutation(size = small, rng = Random(1), rounds = 0)
         assertEquals(small, pSmall.size)
-        assertTrue(pSmall is HalfLongPermutation)
+        assertTrue(pSmall is BoundedLongPermutation)
 
         // (2^10, 2^20]
         val medium = (1L shl 10) + 100L
         val pMedium =
             longPermutation(size = medium, rng = Random(2), rounds = 0)
         assertEquals(medium, pMedium.size)
-        assertTrue(pMedium is HalfLongPermutation)
+        assertTrue(pMedium is BoundedLongPermutation)
 
         // > 2^20
         val large = (1L shl 20) + 100L
         val pLarge = longPermutation(size = large, rng = Random(3), rounds = 0)
         assertEquals(large, pLarge.size)
-        assertTrue(pLarge is HalfLongPermutation)
+        assertTrue(pLarge is BoundedLongPermutation)
     }
 
     @Test
@@ -112,18 +112,18 @@ class LongPermutationsTest {
         val smallNeg = -10L
         val pSmall =
             longPermutation(size = smallNeg, rng = Random(1), rounds = 0)
-        assertTrue(pSmall is ULongPermutation)
+        assertTrue(pSmall is BoundedLongPermutation)
 
         // (2^16, 2^24]
         val midNeg = -((1L shl 16) + 100L)
         val pMid = longPermutation(size = midNeg, rng = Random(2), rounds = 0)
-        assertTrue(pMid is ULongPermutation)
+        assertTrue(pMid is BoundedLongPermutation)
 
         // > 2^24
         val largeNeg = -((1L shl 24) + 100L)
         val pLarge =
             longPermutation(size = largeNeg, rng = Random(3), rounds = 0)
-        assertTrue(pLarge is ULongPermutation)
+        assertTrue(pLarge is BoundedLongPermutation)
 
         val sample = 42L
         assertEquals(sample, pSmall.decode(pSmall.encode(sample)))
@@ -144,7 +144,7 @@ class LongPermutationsTest {
         assertTrue(longPermutation(-1L) is FullLongPermutation)
 
         // Negative non-sentinel uses unsigned-domain variant
-        assertTrue(longPermutation(-10L) is ULongPermutation)
+        assertTrue(longPermutation(-10L) is BoundedLongPermutation)
     }
 
     @Test
@@ -164,8 +164,8 @@ class LongPermutationsTest {
     }
 
     @Test
-    fun halfLongPermutationLargeStillBijection() {
-        val p = HalfLongPermutation(512L, Random(88))
+    fun boundedLongPermutationLargeStillBijection() {
+        val p = BoundedLongPermutation(512L, Random(88))
         CommonAssertsLong.assertBijectionOverDomain(p, 512L)
     }
 
@@ -184,7 +184,7 @@ class LongPermutationsTest {
 
     @Test
     fun rangeWrapperRoundTrip() {
-        val base = HalfLongPermutation(10L, Random(7))
+        val base = BoundedLongPermutation(10L, Random(7))
         val rp = base.range(20L..29L)
         for (v in 20L..29L) {
             assertEquals(v, rp.decode(rp.encode(v)))
@@ -193,7 +193,7 @@ class LongPermutationsTest {
 
     @Test
     fun rangeWrapperIterator() {
-        val base = HalfLongPermutation(5L, Random(1))
+        val base = BoundedLongPermutation(5L, Random(1))
         val rp = base.range(5L..9L)
         val list = rp.toList()
         assertEquals(5, list.size)
@@ -311,6 +311,39 @@ class LongPermutationsTest {
             for (size in listOf(0L, 2L)) {
                 assertFailsWith<IllegalArgumentException> { longPermutation(size, seed = 1L).range(range) }
             }
+        }
+    }
+
+    @Test
+    fun factoryOutputsAreStableAcrossReleases() {
+        val expected = mapOf(
+            (17L to 42L) to listOf(11L, 10L, 7L, 2L, 9L, 1L, 12L, 4L),
+            (1000L to 7L) to listOf(237L, 772L, 57L, 922L, 538L, 906L, 17L, 877L),
+            ((1L shl 40) + 3 to 123L) to listOf(
+                848850590364L,
+                670083459576L,
+                20548540401L,
+                142523264832L,
+                11130046528L,
+                985301304384L,
+                150170275084L,
+                566319598052L,
+            ),
+            (Long.MAX_VALUE to 1L) to listOf(
+                1699888474470711497L,
+                1618433055327283669L,
+                8633390165967847255L,
+                2340819345493507091L,
+                6546443303700477298L,
+                8439873622653727069L,
+                7333081397773360970L,
+                8413434911055314065L,
+            ),
+        )
+        for ((key, values) in expected) {
+            val (size, seed) = key
+            val p = longPermutation(size, seed)
+            assertEquals(values, (0L until 8L).map { p.encode(it) }, "size=$size seed=$seed")
         }
     }
 }
