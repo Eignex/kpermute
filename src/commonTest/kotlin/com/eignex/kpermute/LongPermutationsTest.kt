@@ -313,4 +313,23 @@ class LongPermutationsTest {
             assertEquals(values, (0L until 8L).map { p.encode(it) }, "size=$size seed=$seed")
         }
     }
+
+    @Test
+    fun rangeMismatchMessageReportsFullDomainSize() {
+        val full = assertFailsWith<IllegalArgumentException> {
+            longPermutation(-1L, seed = 1L).range(0L..10L)
+        }
+        assertEquals("base size (18446744073709551616) must equal range length (11)", full.message)
+
+        val wide = assertFailsWith<IllegalArgumentException> {
+            longPermutation(10L, seed = 1L).range(Long.MIN_VALUE..Long.MAX_VALUE)
+        }
+        assertEquals("base size (10) must equal range length (18446744073709551616)", wide.message)
+    }
+
+    @Test
+    fun rangeViewToString() {
+        val p = longPermutation(5L..9L, seed = 1L)
+        assertEquals("LongRangePermutation(range=5..9, base=SmallLongPermutation(size=5))", p.toString())
+    }
 }

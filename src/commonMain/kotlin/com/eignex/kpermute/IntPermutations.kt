@@ -95,4 +95,6 @@ private class IntRangePermutation(val base: IntPermutation, private val range: I
             }
         }
     }
+
+    override fun toString(): String = "IntRangePermutation(range=$range, base=$base)"
 }
