@@ -8,6 +8,8 @@ import kotlin.random.Random
  * Interprets values as `ULong` and permutes `[0, size)` using reversible affine
  * steps and XOR-shift mixing within a 2^k block. Cycle walking ensures that
  * all outputs stay inside the unsigned domain.
+ * [encode] and [decode] reject inputs whose unsigned representation is outside
+ * `[0, size.toULong())`.
  *
  * @property [size] Size of the unsigned domain encoded as a `Long`.
  * @param [rng] Random generator used to derive per-round keys.
@@ -39,6 +41,20 @@ class ULongPermutation(
         kBits = k
         rshift = r
         invConst = PermMathULong.invOdd64(const, mask)
+    }
+
+    override fun encode(value: Long): Long {
+        require(value.toULong() < usize) {
+            "value ${value.toULong()} out of range [0, $usize)"
+        }
+        return encodeUnchecked(value)
+    }
+
+    override fun decode(encoded: Long): Long {
+        require(encoded.toULong() < usize) {
+            "encoded ${encoded.toULong()} out of range [0, $usize)"
+        }
+        return decodeUnchecked(encoded)
     }
 
     override fun encodeUnchecked(value: Long): Long {

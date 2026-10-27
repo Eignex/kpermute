@@ -310,4 +310,42 @@ class IntPermutationsTest {
             assertFailsWith<IllegalArgumentException> { intPermutation(size, seed = 42).range(0..4) }
         }
     }
+
+    @Test
+    fun rangeViewsCanBeRebasedRepeatedly() {
+        for (n in listOf(4, 17, 64)) {
+            val base = intPermutation(n, seed = 1L)
+            val original = base.range(10 until 10 + n)
+            val originalValues = original.toList()
+            var rebased = original
+            val ranges = listOf(
+                20 until 20 + n,
+                -n..-1,
+                Int.MIN_VALUE until Int.MIN_VALUE + n,
+                (Int.MAX_VALUE - n + 1)..Int.MAX_VALUE,
+                0 until n,
+            )
+            for (range in ranges) {
+                rebased = rebased.range(range)
+                val expected = base.map { range.first + it }
+                assertEquals(n, rebased.size)
+                assertEquals(expected, rebased.toList())
+                assertEquals(range.toSet(), expected.toSet())
+                for (value in range) {
+                    val encoded = rebased.encode(value)
+                    assertTrue(encoded in range)
+                    assertEquals(value, rebased.decode(encoded))
+                    assertEquals(encoded, rebased.encodeUnchecked(value))
+                    assertEquals(value, rebased.decodeUnchecked(encoded))
+                }
+                for (offset in listOf(0, 1, n - 1, n)) {
+                    assertEquals(expected.drop(offset), rebased.iterator(offset).asSequence().toList())
+                }
+                val outside = if (range.first == Int.MIN_VALUE) range.last + 1 else range.first - 1
+                assertFailsWith<IllegalArgumentException> { rebased.encode(outside) }
+                assertFailsWith<IllegalArgumentException> { rebased.decode(outside) }
+            }
+            assertEquals(originalValues, original.toList())
+        }
+    }
 }
