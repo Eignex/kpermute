@@ -8,7 +8,7 @@ class UIntPermutationTest {
 
     @Test
     fun bijectionVariousSizes() {
-        for (n in listOf(7, 15, 64, 1000)) {
+        for (n in listOf(1, 2, 3, 4, 7, 15, 64, 1000)) {
             val p = UIntPermutation(n, Random(55))
             CommonAssertsInt.assertBijectionOverDomain(p, n)
         }

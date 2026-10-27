@@ -9,7 +9,7 @@ internal object PermMathInt {
             32 - (sizeExclusive - 1).countLeadingZeroBits()
         }
         val mask = -1 ushr (32 - k) // avoids 1 shl 31 overflow
-        val rshift = (k * 3) / 7
+        val rshift = ((k * 3) / 7).coerceAtLeast(1)
         return Triple(mask, k, rshift)
     }
 
@@ -41,7 +41,7 @@ internal object PermMathUInt {
             32 - ((sizeExclusive - 1u).toInt()).countLeadingZeroBits()
         }
         val mask = if (k == 32) 0xFFFF_FFFFu else (1u shl k) - 1u
-        val rshift = (k * 3) / 7
+        val rshift = ((k * 3) / 7).coerceAtLeast(1)
         return Triple(mask, k, rshift)
     }
 
@@ -73,7 +73,7 @@ internal object PermMathLong {
             64 - (sizeExclusive - 1L).countLeadingZeroBits()
         }
         val mask = if (k == 64) -1L else -1L ushr (64 - k)
-        val rshift = (k * 3) / 7
+        val rshift = ((k * 3) / 7).coerceAtLeast(1)
         return Triple(mask, k, rshift)
     }
 
@@ -106,7 +106,7 @@ internal object PermMathULong {
             64 - ((sizeExclusive - 1uL).toLong()).countLeadingZeroBits()
         }
         val mask = if (k == 64) 0xFFFF_FFFF_FFFF_FFFFuL else (1uL shl k) - 1uL
-        val rshift = (k * 3) / 7
+        val rshift = ((k * 3) / 7).coerceAtLeast(1)
         return Triple(mask, k, rshift)
     }
 

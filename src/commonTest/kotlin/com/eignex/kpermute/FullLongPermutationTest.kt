@@ -55,14 +55,13 @@ class FullLongPermutationTest {
     @Test
     fun iteratorOverflowTerminates() {
         val p = FullLongPermutation(Random(2))
-        // Start close to ULong.MAX_VALUE so sentinel -1L is reached quickly.
-        val start = ULong.MAX_VALUE.toLong() - 5L // -6L
-        val it = p.iterator(start)
-        val list = it.asSequence().toList()
-        assertEquals(5, list.size)
-        val expected = ((ULong.MAX_VALUE - 5uL) until ULong.MAX_VALUE)
-            .map { p.encode(it.toLong()) }
-        assertEquals(expected, list)
+        for (start in listOf(-6L, -1L)) {
+            val iterator = p.iterator(start)
+            val expected = (start..-1L).map { p.encode(it) }
+            assertEquals(expected, iterator.asSequence().toList())
+            assertFalse(iterator.hasNext())
+            assertFailsWith<NoSuchElementException> { iterator.nextLong() }
+        }
     }
 
     @Test
@@ -70,7 +69,7 @@ class FullLongPermutationTest {
         val p = FullLongPermutation(Random(1))
         val start = ULong.MAX_VALUE.toLong() - 3L // -4L
         val itr = p.iterator(start)
-        repeat(3) { itr.nextLong() }
+        repeat(4) { itr.nextLong() }
         assertFailsWith<NoSuchElementException> { itr.nextLong() }
     }
 }

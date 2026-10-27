@@ -56,13 +56,20 @@ class FullLongPermutation(
         return y
     }
 
+    /**
+     * Iterates in unsigned index order from [offset] through `-1`, inclusive.
+     * The default offset of zero visits the entire domain once.
+     */
     override fun iterator(offset: Long): LongIterator {
         var i = offset
+        var exhausted = false
         return object : LongIterator() {
-            override fun hasNext() = i != -1L
+            override fun hasNext() = !exhausted
             override fun nextLong(): Long {
                 if (!hasNext()) throw NoSuchElementException()
-                return encodeUnchecked(i++)
+                val result = encodeUnchecked(i++)
+                exhausted = i == 0L
+                return result
             }
         }
     }

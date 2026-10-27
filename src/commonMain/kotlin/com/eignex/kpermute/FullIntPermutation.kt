@@ -56,13 +56,20 @@ class FullIntPermutation(
         return y
     }
 
+    /**
+     * Iterates in unsigned index order from [offset] through `-1`, inclusive.
+     * The default offset of zero visits the entire domain once.
+     */
     override fun iterator(offset: Int): IntIterator {
         var i = offset
+        var exhausted = false
         return object : IntIterator() {
-            override fun hasNext() = i != -1
+            override fun hasNext() = !exhausted
             override fun nextInt(): Int {
                 if (!hasNext()) throw NoSuchElementException()
-                return encodeUnchecked((i++))
+                val result = encodeUnchecked(i++)
+                exhausted = i == 0
+                return result
             }
         }
     }

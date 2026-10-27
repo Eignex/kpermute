@@ -10,12 +10,15 @@ import kotlin.random.Random
  *
  * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
  * @param [rng] Random generator used to create the shuffled mapping.
+ * @throws IllegalArgumentException if [size] is negative or exceeds [Int.MAX_VALUE].
  */
 class ArrayLongPermutation(override val size: Long, rng: Random) : LongPermutation {
-    private val array = LongArray(size.toInt()) { it.toLong() }
+    private val array: LongArray
     private val inverse: LongArray
 
     init {
+        require(size in 0L..Int.MAX_VALUE.toLong()) { "size must be in 0..Int.MAX_VALUE" }
+        array = LongArray(size.toInt()) { it.toLong() }
         array.shuffle(rng)
         inverse = LongArray(size.toInt())
         for (i in 0..<size.toInt()) {
