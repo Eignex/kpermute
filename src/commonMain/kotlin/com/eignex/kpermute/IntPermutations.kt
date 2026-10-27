@@ -1,8 +1,12 @@
 package com.eignex.kpermute
 
 /**
- * Returns a new list whose elements are permuted by [perm].
- * The original list is not modified.
+ * Returns a read-only view of this list with its elements permuted by [perm].
+ * The original list is not modified or copied. The view's size is fixed when
+ * it is created, so the source list must not change size afterwards.
+ *
+ * [perm] must have the domain `[0, size)`; a range view of another domain is
+ * rejected.
  *
  * Example:
  * ```
@@ -12,27 +16,38 @@ package com.eignex.kpermute
  */
 fun <T> List<T>.permuted(perm: IntPermutation = intPermutation(size)): List<T> {
     val n = size
-    require(perm.size == n) {
-        "Permutation domain (${perm.size}) must equal list size ($n)"
-    }
+    requireIndexDomain(perm, n)
     return object : AbstractList<T>() {
         override val size: Int get() = n
-        override fun get(index: Int): T = this@permuted[perm.decode(index)]
+        override fun get(index: Int): T = this@permuted[perm.decode(checkIndex(index, n))]
     }
 }
 
 /**
- * Applies the inverse of [perm] as a view, restoring the original order.
+ * Applies the inverse of [perm] as a read-only view, restoring the original
+ * order. The same requirements as [permuted] apply.
  */
 fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
     val n = size
+    requireIndexDomain(perm, n)
+    return object : AbstractList<T>() {
+        override val size: Int get() = n
+        override fun get(index: Int): T = this@unpermuted[perm.encode(checkIndex(index, n))]
+    }
+}
+
+private fun requireIndexDomain(perm: IntPermutation, n: Int) {
     require(perm.size == n) {
         "Permutation domain (${perm.size}) must equal list size ($n)"
     }
-    return object : AbstractList<T>() {
-        override val size: Int get() = n
-        override fun get(index: Int): T = this@unpermuted[perm.encode(index)]
+    require(perm !is IntRangePermutation || perm.start == 0) {
+        "Permutation domain must start at 0, not ${(perm as IntRangePermutation).start}"
     }
+}
+
+private fun checkIndex(index: Int, n: Int): Int {
+    if (index !in 0 until n) throw IndexOutOfBoundsException("index $index out of bounds for size $n")
+    return index
 }
 
 /**
@@ -56,7 +71,7 @@ fun IntPermutation.range(range: IntRange): IntPermutation {
 
 private class IntRangePermutation(val base: IntPermutation, private val range: IntRange) : IntPermutation {
     override val size: Int = base.size
-    private val start = range.first
+    val start = range.first
 
     override fun encodeUnchecked(value: Int): Int = start + base.encodeUnchecked(value - start)
 
