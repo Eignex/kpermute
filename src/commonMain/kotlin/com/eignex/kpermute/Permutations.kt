@@ -6,6 +6,18 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 import kotlin.random.Random
 
+// Default rounds for cycle-walking permutations by unsigned domain size.
+private fun defaultRounds(size: ULong): Int = when {
+    // up to 1 K
+    size <= 1uL shl 10 -> 3
+
+    // up to 1 M
+    size <= 1uL shl 20 -> 4
+
+    // larger domains
+    else -> 6
+}
+
 /**
  * Creates an [IntPermutation] for a contiguous integer domain.
  *
@@ -31,24 +43,6 @@ import kotlin.random.Random
 fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0): IntPermutation {
     require(rounds >= 0) { "rounds must be >= 0" }
 
-    // Determine default rounds when not provided.
-    fun defaultRoundsForFinite(n: Int): Int = when {
-        // up to 1 K
-        n <= 1 shl 10 -> 3
-
-        // up to 1 M
-        n <= 1 shl 20 -> 4
-
-        // larger domains
-        else -> 6
-    }
-
-    fun defaultRoundsForUInt(n: Int): Int = when {
-        n <= 1 shl 16 -> 3
-        n <= 1 shl 24 -> 4
-        else -> 5
-    }
-
     return when {
         size == -1 -> FullIntPermutation(
             rng,
@@ -58,7 +52,7 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
         size < 0 -> BoundedIntPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForUInt(size) else rounds,
+            if (rounds == 0) defaultRounds(size.toUInt().toULong()) else rounds,
         )
 
         size <= 16 -> SmallIntPermutation(size, rng)
@@ -66,7 +60,7 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
         else -> BoundedIntPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForFinite(size) else rounds,
+            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
         )
     }
 }
@@ -161,23 +155,6 @@ fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation
 fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {
     require(rounds >= 0) { "rounds must be >= 0" }
 
-    fun defaultRoundsForFinite(n: Long): Int = when {
-        // up to 1 K
-        n <= 1L shl 10 -> 3
-
-        // up to 1 M
-        n <= 1L shl 20 -> 4
-
-        // larger domains
-        else -> 6
-    }
-
-    fun defaultRoundsForULong(n: Long): Int = when {
-        n <= 1L shl 16 -> 3
-        n <= 1L shl 24 -> 4
-        else -> 5
-    }
-
     return when {
         size == -1L -> FullLongPermutation(
             rng,
@@ -187,7 +164,7 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
         size < 0L -> BoundedLongPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForULong(-size) else rounds,
+            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
         )
 
         size <= 16L -> SmallLongPermutation(size, rng)
@@ -196,7 +173,7 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
         else -> BoundedLongPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForFinite(size) else rounds,
+            if (rounds == 0) defaultRounds(size.toULong()) else rounds,
             0x52A531B54E4EC5CBuL,
         )
     }

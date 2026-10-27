@@ -107,28 +107,15 @@ class LongPermutationsTest {
     }
 
     @Test
-    fun longFactoryDefaultRoundsForULongAllBands() {
-        // <= 2^16
-        val smallNeg = -10L
-        val pSmall =
-            longPermutation(size = smallNeg, rng = Random(1), rounds = 0)
-        assertTrue(pSmall is BoundedLongPermutation)
-
-        // (2^16, 2^24]
-        val midNeg = -((1L shl 16) + 100L)
-        val pMid = longPermutation(size = midNeg, rng = Random(2), rounds = 0)
-        assertTrue(pMid is BoundedLongPermutation)
-
-        // > 2^24
-        val largeNeg = -((1L shl 24) + 100L)
-        val pLarge =
-            longPermutation(size = largeNeg, rng = Random(3), rounds = 0)
-        assertTrue(pLarge is BoundedLongPermutation)
-
-        val sample = 42L
-        assertEquals(sample, pSmall.decode(pSmall.encode(sample)))
-        assertEquals(sample, pMid.decode(pMid.encode(sample)))
-        assertEquals(sample, pLarge.decode(pLarge.encode(sample)))
+    fun longFactoryUsesLargestDefaultRoundsForUnsignedSizes() {
+        // Unsigned sizes are always above 2^63, so they get the top band.
+        for (size in listOf(-2L, -10L, -((1L shl 16) + 100L), Long.MIN_VALUE)) {
+            val p = longPermutation(size = size, rng = Random(1), rounds = 0)
+            val expected = longPermutation(size = size, rng = Random(1), rounds = 6)
+            for (v in listOf(0L, 42L, Long.MAX_VALUE, size - 1)) {
+                assertEquals(expected.encode(v), p.encode(v), "size=$size v=$v")
+            }
+        }
     }
 
     @Test
