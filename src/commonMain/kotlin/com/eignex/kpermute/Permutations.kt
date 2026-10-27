@@ -19,7 +19,7 @@ private fun defaultRounds(size: ULong): Int = if (size <= 1uL shl 20) 4 else 6
  * - `size <= 4096`: [SmallIntPermutation].
  * - otherwise: [BoundedIntPermutation].
  *
- * @param rounds mixing rounds; `0` picks a size-dependent default.
+ * A [rounds] of `0` picks a size-dependent default.
  */
 @JvmOverloads
 fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0): IntPermutation {
@@ -89,7 +89,7 @@ fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation
  * - `size <= 4096`: [SmallLongPermutation].
  * - otherwise: [BoundedLongPermutation].
  *
- * @param rounds mixing rounds; `0` picks a size-dependent default.
+ * A [rounds] of `0` picks a size-dependent default.
  */
 @JvmOverloads
 fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {

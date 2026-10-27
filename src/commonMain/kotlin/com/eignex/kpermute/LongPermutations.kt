@@ -2,7 +2,7 @@ package com.eignex.kpermute
 
 /**
  * Returns a view of this permutation shifted onto [range], which must hold
- * exactly [size] values. On an existing range view, replaces its range.
+ * exactly [LongPermutation.size] values. On an existing range view, replaces its range.
  */
 fun LongPermutation.range(range: LongRange): LongPermutation {
     require(!range.isEmpty()) { "range must be non-empty: $range" }

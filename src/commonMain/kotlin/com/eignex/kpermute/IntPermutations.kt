@@ -39,7 +39,7 @@ private fun checkIndex(index: Int, n: Int): Int {
 
 /**
  * Returns a view of this permutation shifted onto [range], which must hold
- * exactly [size] values. On an existing range view, replaces its range.
+ * exactly [IntPermutation.size] values. On an existing range view, replaces its range.
  */
 fun IntPermutation.range(range: IntRange): IntPermutation {
     require(!range.isEmpty()) { "range must be non-empty: $range" }
