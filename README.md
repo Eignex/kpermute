@@ -68,22 +68,16 @@ println(fullPerm.encode(1)) // -299069089
 
 ## How It Works
 
-`size` selects the domain `[0, size)`. `-1` means every 32- or 64-bit value;
-other negative sizes are read as unsigned.
+The size selects the domain 0 until size. A size of -1 means every 32- or
+64-bit value, and other negative sizes are read as unsigned.
 
-| Domain        | Implementation                 | Method                    |
-|---------------|--------------------------------|---------------------------|
-| ≤ 4096        | `Small[Int/Long]Permutation`   | Shuffled lookup table     |
-| Finite        | `Bounded[Int/Long]Permutation` | Mixing with cycle-walking |
-| Full width    | `Full[Int/Long]Permutation`    | Mixing                    |
-
-Range factories such as `intPermutation(-100..199)` wrap these in a view over
-any non-empty range.
+Sizes up to 4096 use a shuffled lookup table. Larger sizes mix within the
+enclosing power-of-two block and use cycle-walking [1] [2], repeating until the
+output is in range. The full 32- or 64-bit domain mixes directly. Range
+factories wrap any of these in a view over a non-empty range.
 
 Each mixing round multiplies by an odd constant, adds or xors a per-round key,
-and applies `x ^= x >>> s`; every step is invertible [1] [3]. For
-non-power-of-two sizes, cycle-walking [1] [2] permutes the enclosing
-power-of-two block and repeats until the output is in range.
+and xor-shifts the value right. Every step is invertible [1] [3].
 
 ## References
 
