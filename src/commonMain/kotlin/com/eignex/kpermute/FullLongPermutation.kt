@@ -23,8 +23,8 @@ class FullLongPermutation(
 
     private val k1: LongArray = LongArray(rounds) { rng.nextLong() }
     private val k2: LongArray = LongArray(rounds) { rng.nextLong() }
-    private val c1Inv: Long = PermMathLong.invOdd64(c1, -1L)
-    private val c2Inv: Long = PermMathLong.invOdd64(c2, -1L)
+    private val c1Inv: Long = PermMath64.invOdd64(c1.toULong(), ULong.MAX_VALUE).toLong()
+    private val c2Inv: Long = PermMath64.invOdd64(c2.toULong(), ULong.MAX_VALUE).toLong()
 
     override fun encodeUnchecked(value: Long): Long {
         var x = value
@@ -44,15 +44,18 @@ class FullLongPermutation(
         var y = encoded
         for (r in rounds - 1 downTo 0) {
             y = y xor k2[r]
-            y = PermMathLong.invXorShift(y, 31, 64, -1L)
+            y = invXorShift(y, 31)
             y *= c2Inv
-            y = PermMathLong.invXorShift(y, 27, 64, -1L)
+            y = invXorShift(y, 27)
             y *= c1Inv
-            y = PermMathLong.invXorShift(y, 30, 64, -1L)
+            y = invXorShift(y, 30)
             y = y xor k1[r]
         }
         return y
     }
+
+    private fun invXorShift(v: Long, s: Int): Long =
+        PermMath64.invXorShift(v.toULong(), s, 64, ULong.MAX_VALUE).toLong()
 
     /** Iterates unsigned indices from [offset] through `-1`. */
     override fun iterator(offset: Long): LongIterator {

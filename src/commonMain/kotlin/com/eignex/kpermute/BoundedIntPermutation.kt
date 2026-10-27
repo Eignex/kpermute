@@ -26,11 +26,11 @@ class BoundedIntPermutation(
         require(rounds > 0) { "rounds must be > 0" }
         require(const % 2u == 1u) { "const must be odd" }
 
-        val (m, k, r) = PermMathUInt.block(size.toUInt())
+        val (m, k, r) = PermMath32.block(size.toUInt())
         mask = m
         kBits = k
         rshift = r
-        invConst = PermMathUInt.invOdd32(const, mask)
+        invConst = PermMath32.invOdd32(const, mask)
     }
 
     // After init so the rounds check runs first. High bits, since low bits of
@@ -69,7 +69,7 @@ class BoundedIntPermutation(
         var x = u and mask
         do {
             for (r in rounds - 1 downTo 0) {
-                x = PermMathUInt.invXorShift(x, rshift, kBits, mask)
+                x = PermMath32.invXorShift(x, rshift, kBits, mask)
                 x = ((x - keys[r]) and mask) * invConst and mask
             }
         } while (x >= usize)

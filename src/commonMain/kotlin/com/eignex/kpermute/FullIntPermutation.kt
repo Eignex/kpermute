@@ -23,8 +23,8 @@ class FullIntPermutation(
 
     private val k1: IntArray = IntArray(rounds) { rng.nextInt() }
     private val k2: IntArray = IntArray(rounds) { rng.nextInt() }
-    private val c1Inv: Int = PermMathInt.invOdd32(c1, -1)
-    private val c2Inv: Int = PermMathInt.invOdd32(c2, -1)
+    private val c1Inv: Int = PermMath32.invOdd32(c1.toUInt(), UInt.MAX_VALUE).toInt()
+    private val c2Inv: Int = PermMath32.invOdd32(c2.toUInt(), UInt.MAX_VALUE).toInt()
 
     override fun encodeUnchecked(value: Int): Int {
         var x = value
@@ -44,15 +44,17 @@ class FullIntPermutation(
         var y = encoded
         for (r in rounds - 1 downTo 0) {
             y = y xor k2[r]
-            y = PermMathInt.invXorShift(y, 16, 32, -1)
+            y = invXorShift(y, 16)
             y *= c2Inv
-            y = PermMathInt.invXorShift(y, 15, 32, -1)
+            y = invXorShift(y, 15)
             y *= c1Inv
-            y = PermMathInt.invXorShift(y, 16, 32, -1)
+            y = invXorShift(y, 16)
             y = y xor k1[r]
         }
         return y
     }
+
+    private fun invXorShift(v: Int, s: Int): Int = PermMath32.invXorShift(v.toUInt(), s, 32, UInt.MAX_VALUE).toInt()
 
     /** Iterates unsigned indices from [offset] through `-1`. */
     override fun iterator(offset: Int): IntIterator {

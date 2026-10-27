@@ -26,11 +26,11 @@ class BoundedLongPermutation(
         require(rounds > 0) { "rounds must be > 0" }
         require(const % 2uL == 1uL) { "const must be odd" }
 
-        val (m, k, r) = PermMathULong.block(usize)
+        val (m, k, r) = PermMath64.block(usize)
         mask = m
         kBits = k
         rshift = r
-        invConst = PermMathULong.invOdd64(const, mask)
+        invConst = PermMath64.invOdd64(const, mask)
     }
 
     // After init so the rounds check runs first.
@@ -69,7 +69,7 @@ class BoundedLongPermutation(
         var x = u and mask
         do {
             for (r in rounds - 1 downTo 0) {
-                x = PermMathULong.invXorShift(x, rshift, kBits, mask)
+                x = PermMath64.invXorShift(x, rshift, kBits, mask)
                 x = ((x - keys[r]) and mask) * invConst and mask
             }
         } while (x >= usize)
