@@ -5,9 +5,7 @@ import kotlin.random.Random
 /**
  * Permutation over `[0, size)` that mixes within the enclosing power-of-two
  * block and cycle-walks until the output lands in range. [size] is read as
- * unsigned, so `-1` means 2^64 - 1 values.
- *
- * @param const odd multiplier for the affine steps.
+ * unsigned, so `-1` means 2^64 - 1 values. [const] must be odd.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 class BoundedLongPermutation(

@@ -4,9 +4,7 @@ import kotlin.random.Random
 
 /**
  * Permutation over all 64-bit values using keyed xor-shift-multiply rounds.
- *
- * @param c1 odd multiplier.
- * @param c2 odd multiplier.
+ * The multipliers [c1] and [c2] must be odd.
  */
 class FullLongPermutation(
     rng: Random = Random.Default,
