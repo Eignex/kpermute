@@ -389,4 +389,16 @@ class IntPermutationsTest {
             assertEquals(values, (0 until 8).map { p.encode(it) }, "size=$size seed=$seed")
         }
     }
+
+    @Test
+    fun intFactoryUsesLargestDefaultRoundsForUnsignedSizes() {
+        // Unsigned sizes are always above 2^31, so they get the top band.
+        for (size in listOf(-2, -10, -((1 shl 16) + 100), Int.MIN_VALUE)) {
+            val p = intPermutation(size = size, rng = Random(1), rounds = 0)
+            val expected = intPermutation(size = size, rng = Random(1), rounds = 6)
+            for (v in listOf(0, 42, Int.MAX_VALUE, size - 1)) {
+                assertEquals(expected.encode(v), p.encode(v), "size=$size v=$v")
+            }
+        }
+    }
 }
