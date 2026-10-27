@@ -401,4 +401,25 @@ class IntPermutationsTest {
             }
         }
     }
+
+    @Test
+    fun listViewsRejectRangePermutationsNotStartingAtZero() {
+        val list = listOf("a", "b", "c")
+        val shifted = intPermutation(1..3, seed = 1L)
+        assertFailsWith<IllegalArgumentException> { list.permuted(shifted) }
+        assertFailsWith<IllegalArgumentException> { list.unpermuted(shifted) }
+
+        val zeroBased = intPermutation(0..2, seed = 1L)
+        assertEquals(list, list.permuted(zeroBased).unpermuted(zeroBased))
+    }
+
+    @Test
+    fun listViewsThrowIndexOutOfBoundsForBadIndices() {
+        val list = (0 until 20).toList()
+        val perm = intPermutation(20, seed = 1L)
+        for (view in listOf(list.permuted(perm), list.unpermuted(perm))) {
+            assertFailsWith<IndexOutOfBoundsException> { view[-1] }
+            assertFailsWith<IndexOutOfBoundsException> { view[20] }
+        }
+    }
 }
