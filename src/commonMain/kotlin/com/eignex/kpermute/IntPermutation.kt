@@ -22,7 +22,8 @@ package com.eignex.kpermute
  *   are in `[0, size)`, compared as unsigned. Out-of-range values trigger
  *   [IllegalArgumentException].
  * - [encodeUnchecked] and [decodeUnchecked] skip range checks and must only
- *   be called with valid domain values when `size != -1`.
+ *   be called with valid domain values when `size != -1`. Other values give
+ *   unspecified results, and cycle-walking implementations may never return.
  * - [iterator] yields `encode(i)` for all valid `i` in index order.
  *
  * Use [intPermutation] to construct concrete implementations.
@@ -39,11 +40,13 @@ interface IntPermutation : Iterable<Int> {
 
     /**
      * Encodes a [value] without range checks.
+     * Out-of-domain input gives an unspecified result and may not terminate.
      */
     fun encodeUnchecked(value: Int): Int
 
     /**
      * Decodes a previously [encoded] value without range checks.
+     * Out-of-domain input gives an unspecified result and may not terminate.
      */
     fun decodeUnchecked(encoded: Int): Int
 

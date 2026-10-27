@@ -2,7 +2,8 @@ package com.eignex.kpermute
 
 /**
  * Returns a view of this permutation that operates on [range].
- * Requires a non-empty range with the same size as this finite permutation.
+ * Requires a non-empty range with the same number of values as this
+ * permutation's domain, which may be unsigned or the full 64-bit space.
  * Calling this on an existing range view replaces its range while preserving
  * the underlying permutation.
  *
@@ -11,17 +12,28 @@ package com.eignex.kpermute
  */
 fun LongPermutation.range(range: LongRange): LongPermutation {
     require(!range.isEmpty()) { "range must be non-empty: $range" }
-    val n = range.last.toULong() - range.first.toULong() + 1uL
-    require(size >= 0L) { "range() requires a finite base permutation" }
-    require(n != 0uL && size.toULong() == n) { "base size ($size) must equal range length ($n)" }
+    require(size != 0L) { "range() requires a non-empty base permutation" }
+    val lastIndex = range.last.toULong() - range.first.toULong()
+    require(lastIndex() == lastIndex) {
+        "base size (${lastIndex() + 1uL}) must equal range length (${lastIndex + 1uL})"
+    }
 
     val base = if (this is LongRangePermutation) this.base else this
     return LongRangePermutation(base, range)
 }
 
+// Largest index of a non-empty domain; size -1 is the full domain unless it is
+// a bounded permutation, where it means 2^64 - 1 values.
+private fun LongPermutation.lastIndex(): ULong = when {
+    this is LongRangePermutation -> lastIndex
+    size == -1L && this !is BoundedLongPermutation -> ULong.MAX_VALUE
+    else -> size.toULong() - 1uL
+}
+
 private class LongRangePermutation(val base: LongPermutation, private val range: LongRange) : LongPermutation {
     override val size: Long = base.size
     private val start = range.first
+    val lastIndex: ULong = range.last.toULong() - range.first.toULong()
 
     override fun encodeUnchecked(value: Long): Long = start + base.encodeUnchecked(value - start)
 
@@ -37,15 +49,19 @@ private class LongRangePermutation(val base: LongPermutation, private val range:
         return decodeUnchecked(encoded)
     }
 
-    // Offsets are indices in 0..size, independent of the range's start.
+    // Offsets are unsigned indices in 0..size, independent of the range's start.
     override fun iterator(offset: Long): LongIterator {
-        require(offset in 0L..size) { "offset $offset out of [0, $size]" }
-        var i = offset
+        var i = offset.toULong()
+        require(lastIndex == ULong.MAX_VALUE || i <= lastIndex + 1uL) {
+            "offset $i out of range [0, ${lastIndex + 1uL}]"
+        }
+        var exhausted = i > lastIndex
         return object : LongIterator() {
-            override fun hasNext() = i < size
+            override fun hasNext() = !exhausted
             override fun nextLong(): Long {
                 if (!hasNext()) throw NoSuchElementException()
-                return start + base.encodeUnchecked(i++)
+                exhausted = i == lastIndex
+                return start + base.encodeUnchecked((i++).toLong())
             }
         }
     }

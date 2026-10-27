@@ -72,13 +72,66 @@ class PermutationsTest {
     }
 
     @Test
-    fun factoriesRejectRangesWhoseLengthsOverflowTheSignedSize() {
-        for (range in listOf(Int.MIN_VALUE..Int.MAX_VALUE, Int.MIN_VALUE..-1, 0..Int.MAX_VALUE)) {
-            assertFailsWith<IllegalArgumentException> { intPermutation(range, seed = 42) }
+    fun factoriesAcceptRangesBeyondTheSignedSize() {
+        val intRanges = listOf(
+            Int.MIN_VALUE..Int.MAX_VALUE,
+            Int.MIN_VALUE + 1..Int.MAX_VALUE,
+            Int.MIN_VALUE..-1,
+            0..Int.MAX_VALUE,
+        )
+        for (range in intRanges) {
+            val perm = intPermutation(range, seed = 42)
+            for (value in listOf(range.first, range.first + 1, range.last - 1, range.last)) {
+                assertTrue(perm.encode(value) in range, "range=$range value=$value")
+                assertTrue(perm.decode(value) in range, "range=$range value=$value")
+                assertEquals(value, perm.decode(perm.encode(value)))
+            }
+            val lastIndex = range.last - range.first
+            assertEquals(
+                listOf(perm.encode(range.last - 1), perm.encode(range.last)),
+                perm.iterator(lastIndex - 1).asSequence().toList(),
+            )
         }
-        for (range in listOf(Long.MIN_VALUE..Long.MAX_VALUE, Long.MIN_VALUE..-1L, 0L..Long.MAX_VALUE)) {
-            assertFailsWith<IllegalArgumentException> { longPermutation(range, seed = 42) }
+        assertTrue(intPermutation(Int.MIN_VALUE..Int.MAX_VALUE, seed = 42).size == -1)
+
+        val longRanges = listOf(
+            Long.MIN_VALUE..Long.MAX_VALUE,
+            Long.MIN_VALUE + 1..Long.MAX_VALUE,
+            Long.MIN_VALUE..-1L,
+            0L..Long.MAX_VALUE,
+        )
+        for (range in longRanges) {
+            val perm = longPermutation(range, seed = 42)
+            for (value in listOf(range.first, range.first + 1, range.last - 1, range.last)) {
+                assertTrue(perm.encode(value) in range, "range=$range value=$value")
+                assertTrue(perm.decode(value) in range, "range=$range value=$value")
+                assertEquals(value, perm.decode(perm.encode(value)))
+            }
+            val lastIndex = range.last - range.first
+            assertEquals(
+                listOf(perm.encode(range.last - 1), perm.encode(range.last)),
+                perm.iterator(lastIndex - 1).asSequence().toList(),
+            )
         }
+        assertTrue(longPermutation(Long.MIN_VALUE..Long.MAX_VALUE, seed = 42).size == -1L)
+    }
+
+    @Test
+    fun unsignedAndFullPermutationsCanBeRebased() {
+        val full = intPermutation(-1, seed = 7)
+        val shifted = full.range(Int.MIN_VALUE..Int.MAX_VALUE)
+        assertEquals(Int.MIN_VALUE + full.encode(5 - Int.MIN_VALUE), shifted.encode(5))
+        val bounded = intPermutation(Int.MIN_VALUE, seed = 7).range(Int.MIN_VALUE..-1)
+        assertTrue(bounded.encode(-1) < 0)
+        assertFailsWith<IllegalArgumentException> { intPermutation(-1, seed = 7).range(0..Int.MAX_VALUE) }
+        assertFailsWith<IllegalArgumentException> { BoundedIntPermutation(-1).range(Int.MIN_VALUE..Int.MAX_VALUE) }
+
+        val fullLong = longPermutation(-1L, seed = 7)
+        assertEquals(
+            Long.MIN_VALUE + fullLong.encode(5L - Long.MIN_VALUE),
+            fullLong.range(Long.MIN_VALUE..Long.MAX_VALUE).encode(5L),
+        )
+        assertFailsWith<IllegalArgumentException> { BoundedLongPermutation(-1L).range(Long.MIN_VALUE..Long.MAX_VALUE) }
     }
 
     @Test

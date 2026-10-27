@@ -6,11 +6,12 @@ import kotlin.jvm.JvmName
 import kotlin.jvm.JvmOverloads
 import kotlin.random.Random
 
+// Largest domain backed by a lookup table. Cycle-walking shows measurable
+// correlation between neighbouring outputs below this size.
+private const val SMALL_MAX = 4096
+
 // Default rounds for cycle-walking permutations by unsigned domain size.
 private fun defaultRounds(size: ULong): Int = when {
-    // up to 1 K
-    size <= 1uL shl 10 -> 3
-
     // up to 1 M
     size <= 1uL shl 20 -> 4
 
@@ -24,8 +25,8 @@ private fun defaultRounds(size: ULong): Int = when {
  * The concrete implementation depends on [size]:
  * - `size == -1` uses [FullIntPermutation] over the full signed 32-bit range.
  * - `size < 0` (excluding `-1`) uses [BoundedIntPermutation] with [size] read as unsigned.
- * - `0 <= size <= 16` uses [SmallIntPermutation].
- * - `size > 16` uses [BoundedIntPermutation] with cycle-walking over a 2^k block.
+ * - `0 <= size <= 4096` uses [SmallIntPermutation].
+ * - `size > 4096` uses [BoundedIntPermutation] with cycle-walking over a 2^k block.
  *
  * When [rounds] is `0`, a size-dependent default is chosen to balance speed and
  * dispersion. The permutation is reproducible for a given [rng] state.
@@ -55,7 +56,7 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
             if (rounds == 0) defaultRounds(size.toUInt().toULong()) else rounds,
         )
 
-        size <= 16 -> SmallIntPermutation(size, rng)
+        size <= SMALL_MAX -> SmallIntPermutation(size, rng)
 
         else -> BoundedIntPermutation(
             size,
@@ -92,23 +93,34 @@ fun intPermutation(size: Int = Int.MAX_VALUE, seed: Long, rounds: Int = 0): IntP
  * and [IntPermutation.decode] operate directly on values in [range].
  *
  * The same implementation selection rules and default [rounds] logic as
- * [intPermutation] are used based on the range length.
+ * [intPermutation] are used based on the range length. Any non-empty range is
+ * accepted; the full `Int` range uses [FullIntPermutation].
  *
  * @param range inclusive range of values to permute.
  * @param rng random source used to derive internal keys and parameters.
  * @param rounds number of mixing rounds; `0` selects a reasonable default per
  *               implementation.
  * @return an [IntPermutation] whose domain is exactly [range].
- * @throws IllegalArgumentException if [range] is empty or its length exceeds [Int.MAX_VALUE].
+ * @throws IllegalArgumentException if [range] is empty.
  */
 @JvmOverloads
 fun intPermutation(range: IntRange, rng: Random = Random.Default, rounds: Int = 0): IntPermutation {
     require(!range.isEmpty()) { "range must be non-empty and increasing: $range" }
-    val nLong = range.last.toLong() - range.first.toLong() + 1L
-    require(nLong <= Int.MAX_VALUE.toLong()) {
-        "range size $nLong exceeds Int.MAX_VALUE"
+    require(rounds >= 0) { "rounds must be >= 0" }
+    val lastIndex = range.last.toUInt() - range.first.toUInt()
+    val base = when (lastIndex) {
+        UInt.MAX_VALUE -> intPermutation(-1, rng, rounds)
+
+        // 2^32 - 1 values: size -1 would select the full domain instead.
+        UInt.MAX_VALUE - 1u -> BoundedIntPermutation(
+            -1,
+            rng,
+            if (rounds == 0) defaultRounds(UInt.MAX_VALUE.toULong()) else rounds,
+        )
+
+        else -> intPermutation((lastIndex + 1u).toInt(), rng, rounds)
     }
-    return intPermutation(nLong.toInt(), rng, rounds).range(range)
+    return base.range(range)
 }
 
 /**
@@ -135,8 +147,8 @@ fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation
  * The concrete implementation depends on [size]:
  * - `size == -1L` uses [FullLongPermutation] over the full signed 64-bit range.
  * - `size < 0L` (excluding `-1L`) uses [BoundedLongPermutation] with [size] read as unsigned.
- * - `0 <= size <= 16L` uses [SmallLongPermutation].
- * - `size > 16L` uses [BoundedLongPermutation] with cycle-walking over a 2^k block.
+ * - `0 <= size <= 4096L` uses [SmallLongPermutation].
+ * - `size > 4096L` uses [BoundedLongPermutation] with cycle-walking over a 2^k block.
  *
  * When [rounds] is `0`, a size-dependent default is chosen to balance speed and
  * dispersion. The permutation is reproducible for a given [rng] state.
@@ -166,7 +178,7 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
             if (rounds == 0) defaultRounds(size.toULong()) else rounds,
         )
 
-        size <= 16L -> SmallLongPermutation(size, rng)
+        size <= SMALL_MAX -> SmallLongPermutation(size, rng)
 
         // Former HalfLongPermutation constant, kept so outputs stay stable.
         else -> BoundedLongPermutation(
@@ -204,24 +216,34 @@ fun longPermutation(size: Long = Long.MAX_VALUE, seed: Long, rounds: Int = 0): L
  * and [LongPermutation.decode] operate directly on values in [range].
  *
  * The same implementation selection rules and default [rounds] logic as
- * [longPermutation] are used based on the range length.
+ * [longPermutation] are used based on the range length. Any non-empty range is
+ * accepted; the full `Long` range uses [FullLongPermutation].
  *
  * @param range inclusive range of values to permute.
  * @param rng random source used to derive internal keys and parameters.
  * @param rounds number of mixing rounds; `0` selects a reasonable default per
  *               implementation.
  * @return a [LongPermutation] whose domain is exactly [range].
- * @throws IllegalArgumentException if [range] is empty or its length exceeds [Long.MAX_VALUE].
+ * @throws IllegalArgumentException if [range] is empty.
  */
 @JvmOverloads
 fun longPermutation(range: LongRange, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {
     require(!range.isEmpty()) { "range must be non-empty and increasing: $range" }
-    // Wraps to 0 for the full Long range, whose size is 2^64.
-    val nULong = range.last.toULong() - range.first.toULong() + 1uL
-    require(nULong in 1uL..Long.MAX_VALUE.toULong()) {
-        "range size of $range exceeds Long.MAX_VALUE"
+    require(rounds >= 0) { "rounds must be >= 0" }
+    val lastIndex = range.last.toULong() - range.first.toULong()
+    val base = when (lastIndex) {
+        ULong.MAX_VALUE -> longPermutation(-1L, rng, rounds)
+
+        // 2^64 - 1 values: size -1 would select the full domain instead.
+        ULong.MAX_VALUE - 1uL -> BoundedLongPermutation(
+            -1L,
+            rng,
+            if (rounds == 0) defaultRounds(ULong.MAX_VALUE) else rounds,
+        )
+
+        else -> longPermutation((lastIndex + 1uL).toLong(), rng, rounds)
     }
-    return longPermutation(nULong.toLong(), rng, rounds).range(range)
+    return base.range(range)
 }
 
 /**

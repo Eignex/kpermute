@@ -71,8 +71,8 @@ Permute the full 32-bit domain:
 
 ```kotlin
 val fullPerm = intPermutation(-1, seed = 1L)
-println(fullPerm.encode(0)) // 1339315335
-println(fullPerm.encode(1)) // -897806455
+println(fullPerm.encode(0)) // 1789640036
+println(fullPerm.encode(1)) // -299069089
 ```
 
 ---
@@ -90,13 +90,13 @@ signed maximum are also supported.
 
 | Domain Type    | Implementation                 | Description                     |
 |----------------|--------------------------------|---------------------------------|
-| Tiny (≤16)     | `Small[Int/Long]Permutation`   | Uses shuffled array and inverse |
+| Small (≤4096)  | `Small[Int/Long]Permutation`   | Uses shuffled array and inverse |
 | Finite         | `Bounded[Int/Long]Permutation` | Uses cycle-walking              |
 | Full bit-width | `Full[Int/Long]Permutation`    | No cycle-walking                |
 
 Range factories like `intPermutation(range)` and `longPermutation(range)` wrap
 these with a range view, so you can permute directly on intervals such as
-`-100..199`.
+`-100..199`. Any non-empty range works, up to the full `Int` or `Long` range.
 
 Each round multiplies by an odd constant, adds or xors a secret per-round key,
 and applies xor-shift steps (`x ^= x >>> s`) to diffuse bits. Every step is
