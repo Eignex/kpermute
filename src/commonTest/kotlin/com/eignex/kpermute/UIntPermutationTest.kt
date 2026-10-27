@@ -83,4 +83,27 @@ class UIntPermutationTest {
             }
         }
     }
+
+    @Test
+    fun rejectsOutOfRangeForUnsignedSizes() {
+        for (size in listOf(Int.MIN_VALUE, Int.MIN_VALUE + 1, -10, -2, -1)) {
+            val permutations = mutableListOf<IntPermutation>(UIntPermutation(size, Random(1)))
+            if (size != -1) permutations += intPermutation(size, seed = 1L)
+            for (p in permutations) {
+                for (invalid in listOf(size, -1).distinct()) {
+                    assertFailsWith<IllegalArgumentException> { p.encode(invalid) }
+                    assertFailsWith<IllegalArgumentException> { p.decode(invalid) }
+                }
+                val valid = mutableListOf(0, 1, Int.MAX_VALUE, (size.toUInt() - 1u).toInt())
+                if (Int.MIN_VALUE.toUInt() < size.toUInt()) valid += Int.MIN_VALUE
+                for (value in valid.distinct()) {
+                    val encoded = p.encode(value)
+                    assertTrue(encoded.toUInt() < size.toUInt())
+                    assertEquals(value, p.decode(encoded))
+                    assertEquals(encoded, p.encodeUnchecked(value))
+                    assertEquals(value, p.decodeUnchecked(encoded))
+                }
+            }
+        }
+    }
 }

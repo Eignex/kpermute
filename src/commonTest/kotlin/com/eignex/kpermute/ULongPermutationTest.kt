@@ -86,4 +86,27 @@ class ULongPermutationTest {
             }
         }
     }
+
+    @Test
+    fun rejectsOutOfRangeForUnsignedSizes() {
+        for (size in listOf(Long.MIN_VALUE, Long.MIN_VALUE + 1L, -10L, -2L, -1L)) {
+            val permutations = mutableListOf<LongPermutation>(ULongPermutation(size, Random(1)))
+            if (size != -1L) permutations += longPermutation(size, seed = 1L)
+            for (p in permutations) {
+                for (invalid in listOf(size, -1L).distinct()) {
+                    assertFailsWith<IllegalArgumentException> { p.encode(invalid) }
+                    assertFailsWith<IllegalArgumentException> { p.decode(invalid) }
+                }
+                val valid = mutableListOf(0L, 1L, Long.MAX_VALUE, (size.toULong() - 1uL).toLong())
+                if (Long.MIN_VALUE.toULong() < size.toULong()) valid += Long.MIN_VALUE
+                for (value in valid.distinct()) {
+                    val encoded = p.encode(value)
+                    assertTrue(encoded.toULong() < size.toULong())
+                    assertEquals(value, p.decode(encoded))
+                    assertEquals(encoded, p.encodeUnchecked(value))
+                    assertEquals(value, p.decodeUnchecked(encoded))
+                }
+            }
+        }
+    }
 }

@@ -36,8 +36,10 @@ fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
 }
 
 /**
- * Returns a view of this permutation that operates on [range] instead of `[0, size)`.
+ * Returns a view of this permutation that operates on [range].
  * Only valid for finite domains where `range.count() == size`.
+ * Calling this on an existing range view replaces its range while preserving
+ * the underlying permutation.
  *
  * Useful for permuting values within numeric subranges such as dataset shards,
  * sliding windows, or bounded ID segments without manual offset math.
@@ -47,37 +49,37 @@ fun IntPermutation.range(range: IntRange): IntPermutation {
     require(size >= 0) { "range() requires a finite base permutation" }
     require(size == n) { "base size ($size) must equal range length ($n)" }
 
-    val start = range.first
-    return object : IntPermutation {
-        override val size: Int = n
+    val base = if (this is IntRangePermutation) this.base else this
+    return IntRangePermutation(base, range)
+}
 
-        // Unchecked operate on *range values*.
-        override fun encodeUnchecked(value: Int): Int = start + this@range.encodeUnchecked(value - start)
+private class IntRangePermutation(val base: IntPermutation, private val range: IntRange) : IntPermutation {
+    override val size: Int = base.size
+    private val start = range.first
 
-        override fun decodeUnchecked(encoded: Int): Int = start + this@range.decodeUnchecked(encoded - start)
+    override fun encodeUnchecked(value: Int): Int = start + base.encodeUnchecked(value - start)
 
-        // Checked wrappers validate range membership.
-        override fun encode(value: Int): Int {
-            require(value in range) { "value $value out of $range" }
-            return encodeUnchecked(value)
-        }
+    override fun decodeUnchecked(encoded: Int): Int = start + base.decodeUnchecked(encoded - start)
 
-        override fun decode(encoded: Int): Int {
-            require(encoded in range) { "encoded $encoded out of $range" }
-            return decodeUnchecked(encoded)
-        }
+    override fun encode(value: Int): Int {
+        require(value in range) { "value $value out of $range" }
+        return encodeUnchecked(value)
+    }
 
-        // Iterator yields permuted values for inputs in [range.first+offset, range.last].
-        // offset is measured in *indices* (0..n), consistent with base contract.
-        override fun iterator(offset: Int): IntIterator {
-            require(offset in 0..n) { "offset $offset out of [0, $n]" }
-            var i = offset
-            return object : IntIterator() {
-                override fun hasNext() = i < n
-                override fun nextInt(): Int {
-                    if (!hasNext()) throw NoSuchElementException()
-                    return start + this@range.encodeUnchecked(i++)
-                }
+    override fun decode(encoded: Int): Int {
+        require(encoded in range) { "encoded $encoded out of $range" }
+        return decodeUnchecked(encoded)
+    }
+
+    // Offsets are indices in 0..size, independent of the range's start.
+    override fun iterator(offset: Int): IntIterator {
+        require(offset in 0..size) { "offset $offset out of [0, $size]" }
+        var i = offset
+        return object : IntIterator() {
+            override fun hasNext() = i < size
+            override fun nextInt(): Int {
+                if (!hasNext()) throw NoSuchElementException()
+                return start + base.encodeUnchecked(i++)
             }
         }
     }
