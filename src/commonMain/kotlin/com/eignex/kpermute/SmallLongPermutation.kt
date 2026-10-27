@@ -30,10 +30,9 @@ class SmallLongPermutation(override val size: Long, rng: Random) : LongPermutati
 
     override fun decodeUnchecked(encoded: Long): Long = inverse[encoded.toInt()]
 
-    override fun iterator(offset: Long): LongIterator = if (offset == 0L) {
-        array.iterator()
-    } else {
-        array.sliceArray(offset.toInt()..<size.toInt()).iterator()
+    override fun iterator(offset: Long): LongIterator {
+        checkOffset(offset, size)
+        return if (offset == 0L) array.iterator() else array.sliceArray(offset.toInt()..<size.toInt()).iterator()
     }
 
     override fun toString(): String = "SmallLongPermutation(size=$size)"

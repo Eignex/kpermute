@@ -23,6 +23,12 @@ class FullIntPermutation(
 
     override val size: Int get() = -1
 
+    init {
+        require(rounds > 0) { "rounds must be > 0" }
+        require(c1 and 1 == 1) { "c1 must be odd" }
+        require(c2 and 1 == 1) { "c2 must be odd" }
+    }
+
     private val k1: IntArray = IntArray(rounds) { rng.nextInt() }
     private val k2: IntArray = IntArray(rounds) { rng.nextInt() }
     private val c1Inv: Int = PermMathInt.invOdd32(c1, -1)

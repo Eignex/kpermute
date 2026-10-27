@@ -17,4 +17,14 @@ class SmallLongPermutationTest {
             CommonAssertsLong.assertBijectionOverDomain(SmallLongPermutation(size, Random(1)), size)
         }
     }
+
+    @Test
+    fun rejectsInvalidSizeAndOffsets() {
+        assertFailsWith<IllegalArgumentException> { SmallLongPermutation(-1L, Random(1)) }
+        val p = SmallLongPermutation(10L, Random(1))
+        for (offset in listOf(-1L, 11L, (1L shl 32) + 1)) {
+            assertFailsWith<IllegalArgumentException>("offset=$offset") { p.iterator(offset) }
+        }
+        assertFalse(p.iterator(10L).hasNext())
+    }
 }

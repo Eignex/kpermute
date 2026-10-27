@@ -3,6 +3,8 @@ package com.eignex.kpermute
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 
 class SmallIntPermutationTest {
 
@@ -46,5 +48,15 @@ class SmallIntPermutationTest {
         val n = 7
         val p = SmallIntPermutation(n, Random(3))
         CommonAssertsInt.assertRangeChecks(p, n)
+    }
+
+    @Test
+    fun rejectsInvalidSizeAndOffsets() {
+        assertFailsWith<IllegalArgumentException> { SmallIntPermutation(-1, Random(1)) }
+        val p = SmallIntPermutation(10, Random(1))
+        for (offset in listOf(-1, 11, Int.MIN_VALUE)) {
+            assertFailsWith<IllegalArgumentException>("offset=$offset") { p.iterator(offset) }
+        }
+        assertFalse(p.iterator(10).hasNext())
     }
 }

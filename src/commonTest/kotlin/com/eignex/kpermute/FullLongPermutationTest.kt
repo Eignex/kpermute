@@ -72,4 +72,12 @@ class FullLongPermutationTest {
         repeat(4) { itr.nextLong() }
         assertFailsWith<NoSuchElementException> { itr.nextLong() }
     }
+
+    @Test
+    fun rejectsInvalidConstructorArguments() {
+        assertFailsWith<IllegalArgumentException> { FullLongPermutation(Random(1), rounds = 0) }
+        assertFailsWith<IllegalArgumentException> { FullLongPermutation(Random(1), rounds = -1) }
+        assertFailsWith<IllegalArgumentException> { FullLongPermutation(Random(1), c1 = 2L) }
+        assertFailsWith<IllegalArgumentException> { FullLongPermutation(Random(1), c2 = 0L) }
+    }
 }

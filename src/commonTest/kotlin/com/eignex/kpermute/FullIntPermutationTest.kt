@@ -63,4 +63,12 @@ class FullIntPermutationTest {
         repeat(4) { itr.nextInt() }
         assertFailsWith<NoSuchElementException> { itr.nextInt() }
     }
+
+    @Test
+    fun rejectsInvalidConstructorArguments() {
+        assertFailsWith<IllegalArgumentException> { FullIntPermutation(Random(1), rounds = 0) }
+        assertFailsWith<IllegalArgumentException> { FullIntPermutation(Random(1), rounds = -1) }
+        assertFailsWith<IllegalArgumentException> { FullIntPermutation(Random(1), c1 = 2) }
+        assertFailsWith<IllegalArgumentException> { FullIntPermutation(Random(1), c2 = 0) }
+    }
 }

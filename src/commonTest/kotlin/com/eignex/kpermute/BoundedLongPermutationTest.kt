@@ -114,4 +114,22 @@ class BoundedLongPermutationTest {
     fun rejectsZeroSize() {
         assertFailsWith<IllegalArgumentException> { BoundedLongPermutation(0L, Random(1)) }
     }
+
+    @Test
+    fun rejectsNegativeRoundsBeforeAllocating() {
+        assertFailsWith<IllegalArgumentException> { BoundedLongPermutation(100L, Random(1), rounds = -1) }
+    }
+
+    @Test
+    fun rejectsOffsetsOutsideTheDomain() {
+        val p = BoundedLongPermutation(17L, Random(1))
+        for (offset in listOf(-1L, 18L)) {
+            assertFailsWith<IllegalArgumentException>("offset=$offset") { p.iterator(offset) }
+        }
+        assertFalse(p.iterator(17L).hasNext())
+        // Unsigned sizes accept offsets above the signed maximum.
+        val unsigned = BoundedLongPermutation(-2L, Random(1))
+        assertTrue(unsigned.iterator(-3L).hasNext())
+        assertFailsWith<IllegalArgumentException> { unsigned.iterator(-1L) }
+    }
 }
