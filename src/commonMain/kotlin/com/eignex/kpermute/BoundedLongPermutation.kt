@@ -3,21 +3,22 @@ package com.eignex.kpermute
 import kotlin.random.Random
 
 /**
- * Finite permutation over an unsigned 64-bit-style domain encoded as `Long`.
+ * Finite permutation over `[0, size)` using cycle-walking over a 2^k block.
  *
- * Interprets values as `ULong` and permutes `[0, size)` using reversible affine
- * steps and XOR-shift mixing within a 2^k block. Cycle walking ensures that
- * all outputs stay inside the unsigned domain.
+ * Applies reversible affine steps and XOR-shift mixing within the smallest
+ * power-of-two block containing the domain, and walks outputs outside
+ * `[0, size)` until they fall back inside. [size] is read as unsigned, so
+ * negative values select domains larger than the signed Long maximum.
  * [encode] and [decode] reject inputs whose unsigned representation is outside
  * `[0, size.toULong())`.
  *
- * @property [size] Size of the unsigned domain encoded as a `Long`.
+ * @property [size] Domain size, read as an unsigned 64-bit value.
  * @param [rng] Random generator used to derive per-round keys.
  * @param [rounds] Number of mixing rounds; higher values increase dispersion.
  * @param [const] Odd multiplicative constant used in each affine step.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-class ULongPermutation(
+class BoundedLongPermutation(
     override val size: Long,
     rng: Random = Random.Default,
     private val rounds: Int = 3,
@@ -33,6 +34,7 @@ class ULongPermutation(
     private val invConst: ULong
 
     init {
+        require(usize != 0uL) { "size must be != 0" }
         require(rounds > 0) { "rounds must be > 0" }
         require(const % 2uL == 1uL) { "const must be odd" }
 
@@ -92,5 +94,5 @@ class ULongPermutation(
         }
     }
 
-    override fun toString(): String = "ULongPermutation(size=$size)"
+    override fun toString(): String = "BoundedLongPermutation(size=$size)"
 }

@@ -4,12 +4,12 @@ import kotlin.random.Random
 import kotlin.test.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class ULongPermutationTest {
+class BoundedLongPermutationTest {
 
     @Test
     fun bijectionVariousSizes() {
         for (n in listOf(1L, 2L, 3L, 4L, 7L, 15L, 64L, 1000L)) {
-            val p = ULongPermutation(n, Random(55))
+            val p = BoundedLongPermutation(n, Random(55))
             CommonAssertsLong.assertBijectionOverDomain(p, n)
         }
     }
@@ -17,7 +17,7 @@ class ULongPermutationTest {
     @Test
     fun iteratorFullAndOffsetsEdgeCases() {
         val n = 5L
-        val p = ULongPermutation(n, Random(1))
+        val p = BoundedLongPermutation(n, Random(1))
 
         // full
         CommonAssertsLong.assertIteratorMatchesEncode(p, n)
@@ -38,24 +38,24 @@ class ULongPermutationTest {
     @Test
     fun deterministicForSameSeed() {
         val n = 20L
-        val factory = { ULongPermutation(n, Random(9)) }
+        val factory = { BoundedLongPermutation(n, Random(9)) }
         CommonAssertsLong.assertDeterministic(factory)
     }
 
     @Test
     fun roundsAndConstConstraintsAndVariation() {
         assertFailsWith<IllegalArgumentException> {
-            ULongPermutation(32L, Random(1), const = 4uL)
+            BoundedLongPermutation(32L, Random(1), const = 4uL)
         }
-        val p1 = ULongPermutation(128L, Random(5), rounds = 1)
-        val p2 = ULongPermutation(128L, Random(5), rounds = 5)
+        val p1 = BoundedLongPermutation(128L, Random(5), rounds = 1)
+        val p2 = BoundedLongPermutation(128L, Random(5), rounds = 5)
         CommonAssertsLong.assertDifferentMapping(p1, p2)
     }
 
     @Test
     fun rejectsOutOfRange() {
         val n = 10L
-        val p = ULongPermutation(n, Random(1))
+        val p = BoundedLongPermutation(n, Random(1))
         CommonAssertsLong.assertRangeChecks(p, n)
     }
 
@@ -63,7 +63,7 @@ class ULongPermutationTest {
     fun unsignedLongDomainsPreserveValuesOnBothSidesOfTheSignBit() {
         for (size in listOf(Long.MIN_VALUE, Long.MIN_VALUE + 1, -2L)) {
             for (seed in listOf(0L, 42L, Long.MIN_VALUE)) {
-                val perm = ULongPermutation(size, Random(seed))
+                val perm = BoundedLongPermutation(size, Random(seed))
                 val samples = listOf(0L, 1L, Long.MAX_VALUE - 1, Long.MAX_VALUE, Long.MIN_VALUE, size - 1)
                     .filter { it.toULong() < size.toULong() }
                 for (value in samples) {
@@ -90,7 +90,7 @@ class ULongPermutationTest {
     @Test
     fun rejectsOutOfRangeForUnsignedSizes() {
         for (size in listOf(Long.MIN_VALUE, Long.MIN_VALUE + 1L, -10L, -2L, -1L)) {
-            val permutations = mutableListOf<LongPermutation>(ULongPermutation(size, Random(1)))
+            val permutations = mutableListOf<LongPermutation>(BoundedLongPermutation(size, Random(1)))
             if (size != -1L) permutations += longPermutation(size, seed = 1L)
             for (p in permutations) {
                 for (invalid in listOf(size, -1L).distinct()) {
@@ -108,5 +108,10 @@ class ULongPermutationTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun rejectsZeroSize() {
+        assertFailsWith<IllegalArgumentException> { BoundedLongPermutation(0L, Random(1)) }
     }
 }

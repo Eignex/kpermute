@@ -1,5 +1,6 @@
-public final class com/eignex/kpermute/ArrayIntPermutation : com/eignex/kpermute/IntPermutation {
-	public fun <init> (ILkotlin/random/Random;)V
+public final class com/eignex/kpermute/BoundedIntPermutation : com/eignex/kpermute/IntPermutation {
+	public synthetic fun <init> (ILkotlin/random/Random;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (ILkotlin/random/Random;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun decode (I)I
 	public fun decodeUnchecked (I)I
 	public fun encode (I)I
@@ -11,8 +12,9 @@ public final class com/eignex/kpermute/ArrayIntPermutation : com/eignex/kpermute
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/eignex/kpermute/ArrayLongPermutation : com/eignex/kpermute/LongPermutation {
-	public fun <init> (JLkotlin/random/Random;)V
+public final class com/eignex/kpermute/BoundedLongPermutation : com/eignex/kpermute/LongPermutation {
+	public synthetic fun <init> (JLkotlin/random/Random;IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLkotlin/random/Random;IJLkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun decode (J)J
 	public fun decodeUnchecked (J)J
 	public fun encode (J)J
@@ -43,36 +45,6 @@ public final class com/eignex/kpermute/FullLongPermutation : com/eignex/kpermute
 	public fun <init> ()V
 	public fun <init> (Lkotlin/random/Random;IJJ)V
 	public synthetic fun <init> (Lkotlin/random/Random;IJJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun decode (J)J
-	public fun decodeUnchecked (J)J
-	public fun encode (J)J
-	public fun encodeUnchecked (J)J
-	public fun getSize ()J
-	public synthetic fun iterator ()Ljava/util/Iterator;
-	public fun iterator ()Lkotlin/collections/LongIterator;
-	public fun iterator (J)Lkotlin/collections/LongIterator;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/eignex/kpermute/HalfIntPermutation : com/eignex/kpermute/IntPermutation {
-	public fun <init> ()V
-	public fun <init> (ILkotlin/random/Random;II)V
-	public synthetic fun <init> (ILkotlin/random/Random;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public fun decode (I)I
-	public fun decodeUnchecked (I)I
-	public fun encode (I)I
-	public fun encodeUnchecked (I)I
-	public fun getSize ()I
-	public synthetic fun iterator ()Ljava/util/Iterator;
-	public fun iterator ()Lkotlin/collections/IntIterator;
-	public fun iterator (I)Lkotlin/collections/IntIterator;
-	public fun toString ()Ljava/lang/String;
-}
-
-public final class com/eignex/kpermute/HalfLongPermutation : com/eignex/kpermute/LongPermutation {
-	public fun <init> ()V
-	public fun <init> (JLkotlin/random/Random;IJ)V
-	public synthetic fun <init> (JLkotlin/random/Random;IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public fun decode (J)J
 	public fun decodeUnchecked (J)J
 	public fun encode (J)J
@@ -161,9 +133,8 @@ public final class com/eignex/kpermute/Permutations {
 	public static synthetic fun longPermutation$default (Lkotlin/ranges/LongRange;Lkotlin/random/Random;IILjava/lang/Object;)Lcom/eignex/kpermute/LongPermutation;
 }
 
-public final class com/eignex/kpermute/UIntPermutation : com/eignex/kpermute/IntPermutation {
-	public synthetic fun <init> (ILkotlin/random/Random;IIILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (ILkotlin/random/Random;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+public final class com/eignex/kpermute/SmallIntPermutation : com/eignex/kpermute/IntPermutation {
+	public fun <init> (ILkotlin/random/Random;)V
 	public fun decode (I)I
 	public fun decodeUnchecked (I)I
 	public fun encode (I)I
@@ -175,9 +146,8 @@ public final class com/eignex/kpermute/UIntPermutation : com/eignex/kpermute/Int
 	public fun toString ()Ljava/lang/String;
 }
 
-public final class com/eignex/kpermute/ULongPermutation : com/eignex/kpermute/LongPermutation {
-	public synthetic fun <init> (JLkotlin/random/Random;IJILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public synthetic fun <init> (JLkotlin/random/Random;IJLkotlin/jvm/internal/DefaultConstructorMarker;)V
+public final class com/eignex/kpermute/SmallLongPermutation : com/eignex/kpermute/LongPermutation {
+	public fun <init> (JLkotlin/random/Random;)V
 	public fun decode (J)J
 	public fun decodeUnchecked (J)J
 	public fun encode (J)J

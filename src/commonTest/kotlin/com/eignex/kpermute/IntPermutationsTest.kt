@@ -24,25 +24,25 @@ class IntPermutationsTest {
             intPermutation(
                 size = -5,
                 rng = Random(1),
-            ) is UIntPermutation,
+            ) is BoundedIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 0,
                 rng = Random(1),
-            ) is ArrayIntPermutation,
+            ) is SmallIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 16,
                 rng = Random(1),
-            ) is ArrayIntPermutation,
+            ) is SmallIntPermutation,
         )
         assertTrue(
             intPermutation(
                 size = 17,
                 rng = Random(1),
-            ) is HalfIntPermutation,
+            ) is BoundedIntPermutation,
         )
     }
 
@@ -52,25 +52,25 @@ class IntPermutationsTest {
         val small = 600 // > 16 and <= 2^10
         val pSmall = intPermutation(size = small, rng = Random(1), rounds = 0)
         assertEquals(small, pSmall.size)
-        assertTrue(pSmall is HalfIntPermutation)
+        assertTrue(pSmall is BoundedIntPermutation)
 
         // (2^10, 2^20] branch
         val medium = (1 shl 10) + 100
         val pMedium = intPermutation(size = medium, rng = Random(2), rounds = 0)
         assertEquals(medium, pMedium.size)
-        assertTrue(pMedium is HalfIntPermutation)
+        assertTrue(pMedium is BoundedIntPermutation)
 
         // > 2^20 branch
         val large = (1 shl 20) + 100
         val pLarge = intPermutation(size = large, rng = Random(3), rounds = 0)
         assertEquals(large, pLarge.size)
-        assertTrue(pLarge is HalfIntPermutation)
+        assertTrue(pLarge is BoundedIntPermutation)
     }
 
     @Test
     fun intFactoryUsesExplicitRoundsWhenNonZero() {
         val p = intPermutation(size = 128, rng = Random(4), rounds = 5)
-        assertTrue(p is HalfIntPermutation)
+        assertTrue(p is BoundedIntPermutation)
         val x = 42
         assertEquals(x, p.decode(p.encode(x)))
     }
@@ -107,10 +107,10 @@ class IntPermutationsTest {
 
     @Test
     fun selectsImplementationBySize() {
-        assertTrue(intPermutation(8) is ArrayIntPermutation)
-        assertTrue(intPermutation(17) is HalfIntPermutation)
+        assertTrue(intPermutation(8) is SmallIntPermutation)
+        assertTrue(intPermutation(17) is BoundedIntPermutation)
         assertTrue(intPermutation(-1) is FullIntPermutation)
-        assertTrue(intPermutation(-10) is UIntPermutation)
+        assertTrue(intPermutation(-10) is BoundedIntPermutation)
     }
 
     @Test
@@ -124,14 +124,14 @@ class IntPermutationsTest {
     fun smallSizesUseArrayPermutationAndAreBijections() {
         for (n in 0..16) {
             val p = intPermutation(n)
-            assertTrue(p is ArrayIntPermutation)
+            assertTrue(p is SmallIntPermutation)
             assertEquals(n, p.toList().toSet().size)
         }
     }
 
     @Test
-    fun halfIntPermutationLargeStillBijection() {
-        val p = HalfIntPermutation(512, Random(88))
+    fun boundedIntPermutationLargeStillBijection() {
+        val p = BoundedIntPermutation(512, Random(88))
         CommonAssertsInt.assertBijectionOverDomain(p, 512)
     }
 
@@ -150,7 +150,7 @@ class IntPermutationsTest {
 
     @Test
     fun permutedByRoundTrip() {
-        val p = ArrayIntPermutation(5, Random(7))
+        val p = SmallIntPermutation(5, Random(7))
         val data = listOf("a", "b", "c", "d", "e")
         val shuffled = data.permuted(p)
         val restored = shuffled.unpermuted(p)
@@ -363,6 +363,30 @@ class IntPermutationsTest {
             for (size in listOf(0, 2)) {
                 assertFailsWith<IllegalArgumentException> { intPermutation(size, seed = 1L).range(range) }
             }
+        }
+    }
+
+    @Test
+    fun factoryOutputsAreStableAcrossReleases() {
+        val expected = mapOf(
+            (17 to 42L) to listOf(16, 2, 3, 6, 4, 11, 8, 13),
+            (1000 to 7L) to listOf(871, 437, 599, 344, 151, 37, 562, 946),
+            (1_000_003 to 123L) to listOf(837632, 718097, 569769, 516486, 624585, 984698, 546467, 601712),
+            (Int.MAX_VALUE to 1L) to listOf(
+                341430956,
+                165841731,
+                1848863319,
+                1956760551,
+                1513048613,
+                463180597,
+                9287647,
+                191457700,
+            ),
+        )
+        for ((key, values) in expected) {
+            val (size, seed) = key
+            val p = intPermutation(size, seed)
+            assertEquals(values, (0 until 8).map { p.encode(it) }, "size=$size seed=$seed")
         }
     }
 }

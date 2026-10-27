@@ -11,9 +11,9 @@ import kotlin.random.Random
  *
  * The concrete implementation depends on [size]:
  * - `size == -1` uses [FullIntPermutation] over the full signed 32-bit range.
- * - `size < 0` (excluding `-1`) uses [UIntPermutation] over an unsigned-style domain.
- * - `0 <= size <= 16` uses [ArrayIntPermutation].
- * - `size > 16` uses [HalfIntPermutation] with cycle-walking over a 2^k block.
+ * - `size < 0` (excluding `-1`) uses [BoundedIntPermutation] with [size] read as unsigned.
+ * - `0 <= size <= 16` uses [SmallIntPermutation].
+ * - `size > 16` uses [BoundedIntPermutation] with cycle-walking over a 2^k block.
  *
  * When [rounds] is `0`, a size-dependent default is chosen to balance speed and
  * dispersion. The permutation is reproducible for a given [rng] state.
@@ -32,7 +32,7 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
     require(rounds >= 0) { "rounds must be >= 0" }
 
     // Determine default rounds when not provided.
-    fun defaultRoundsForHalf(n: Int): Int = when {
+    fun defaultRoundsForFinite(n: Int): Int = when {
         // up to 1 K
         n <= 1 shl 10 -> 3
 
@@ -55,18 +55,18 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
             if (rounds == 0) 2 else rounds, // FullInt needs few rounds
         )
 
-        size < 0 -> UIntPermutation(
+        size < 0 -> BoundedIntPermutation(
             size,
             rng,
             if (rounds == 0) defaultRoundsForUInt(size) else rounds,
         )
 
-        size <= 16 -> ArrayIntPermutation(size, rng)
+        size <= 16 -> SmallIntPermutation(size, rng)
 
-        else -> HalfIntPermutation(
+        else -> BoundedIntPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForHalf(size) else rounds,
+            if (rounds == 0) defaultRoundsForFinite(size) else rounds,
         )
     }
 }
@@ -141,9 +141,9 @@ fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation
  *
  * The concrete implementation depends on [size]:
  * - `size == -1L` uses [FullLongPermutation] over the full signed 64-bit range.
- * - `size < 0L` (excluding `-1L`) uses [ULongPermutation] over an unsigned-style domain.
- * - `0 <= size <= 16L` uses [ArrayLongPermutation].
- * - `size > 16L` uses [HalfLongPermutation] with cycle-walking over a 2^k block.
+ * - `size < 0L` (excluding `-1L`) uses [BoundedLongPermutation] with [size] read as unsigned.
+ * - `0 <= size <= 16L` uses [SmallLongPermutation].
+ * - `size > 16L` uses [BoundedLongPermutation] with cycle-walking over a 2^k block.
  *
  * When [rounds] is `0`, a size-dependent default is chosen to balance speed and
  * dispersion. The permutation is reproducible for a given [rng] state.
@@ -161,7 +161,7 @@ fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation
 fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {
     require(rounds >= 0) { "rounds must be >= 0" }
 
-    fun defaultRoundsForHalf(n: Long): Int = when {
+    fun defaultRoundsForFinite(n: Long): Int = when {
         // up to 1 K
         n <= 1L shl 10 -> 3
 
@@ -184,18 +184,20 @@ fun longPermutation(size: Long = Long.MAX_VALUE, rng: Random = Random.Default, r
             if (rounds == 0) 2 else rounds,
         )
 
-        size < 0L -> ULongPermutation(
+        size < 0L -> BoundedLongPermutation(
             size,
             rng,
             if (rounds == 0) defaultRoundsForULong(-size) else rounds,
         )
 
-        size <= 16L -> ArrayLongPermutation(size, rng)
+        size <= 16L -> SmallLongPermutation(size, rng)
 
-        else -> HalfLongPermutation(
+        // Former HalfLongPermutation constant, kept so outputs stay stable.
+        else -> BoundedLongPermutation(
             size,
             rng,
-            if (rounds == 0) defaultRoundsForHalf(size) else rounds,
+            if (rounds == 0) defaultRoundsForFinite(size) else rounds,
+            0x52A531B54E4EC5CBuL,
         )
     }
 }

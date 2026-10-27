@@ -85,15 +85,14 @@ every output decodes back to its original value.
 
 A permutation is selected by its size. A positive size means a finite domain
 `[0, size)`. A size of `-1` or `-1L` means the full 32- or 64-bit signed
-domain. Other negative sizes select the unsigned variants via `UIntPermutation`
-or `ULongPermutation`.
+domain. Other negative sizes are read as unsigned, so domains larger than the
+signed maximum are also supported.
 
-| Domain Type       | Implementation               | Description                     |
-|-------------------|------------------------------|---------------------------------|
-| Tiny (≤16)        | `Array[Int/Long]Permutation` | Uses shuffled array and inverse |
-| Finite            | `Half[Int/Long]Permutation`  | Uses cycle-walking              |
-| Full bit-width    | `Full[Int/Long]Permutation`  | No cycle-walking                |
-| Unsigned variants | `U[Int/Long]Permutation`     | Modulo 2^32 or 2^64             |
+| Domain Type    | Implementation                 | Description                     |
+|----------------|--------------------------------|---------------------------------|
+| Tiny (≤16)     | `Small[Int/Long]Permutation`   | Uses shuffled array and inverse |
+| Finite         | `Bounded[Int/Long]Permutation` | Uses cycle-walking              |
+| Full bit-width | `Full[Int/Long]Permutation`    | No cycle-walking                |
 
 Range factories like `intPermutation(range)` and `longPermutation(range)` wrap
 these with a range view, so you can permute directly on intervals such as

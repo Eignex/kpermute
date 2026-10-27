@@ -15,13 +15,13 @@ class FuzzyingTest {
         var size: Int
         do {
             size = when (rng.nextInt(4)) {
-                // ArrayIntPermutation
+                // SmallIntPermutation
                 0 -> rng.nextInt(17)
 
-                // HalfIntPermutation (size > 0)
+                // BoundedIntPermutation (size > 16)
                 1 -> rng.nextInt()
 
-                // UIntPermutation (size < 0, except 0)
+                // BoundedIntPermutation (size < 0)
                 2 -> rng.nextUInt().toInt()
 
                 // FullIntPermutation sentinel
@@ -37,13 +37,13 @@ class FuzzyingTest {
         var size: Long
         do {
             size = when (rng.nextInt(4)) {
-                // ArrayLongPermutation
+                // SmallLongPermutation
                 0 -> rng.nextLong(17L)
 
-                // HalfLongPermutation (size > 0)
+                // BoundedLongPermutation (size > 16)
                 1 -> rng.nextLong()
 
-                // ULongPermutation (size < 0, except 0)
+                // BoundedLongPermutation (size < 0)
                 2 -> rng.nextULong().toLong()
 
                 // FullLongPermutation sentinel
@@ -187,9 +187,8 @@ class FuzzyingTest {
 
     private fun runIntFuzz(useIterator: Boolean) {
         val pValuesByClass = mapOf<String, MutableList<Double>>(
-            ArrayIntPermutation::class.simpleName!! to ArrayList(),
-            HalfIntPermutation::class.simpleName!! to ArrayList(),
-            UIntPermutation::class.simpleName!! to ArrayList(),
+            SmallIntPermutation::class.simpleName!! to ArrayList(),
+            BoundedIntPermutation::class.simpleName!! to ArrayList(),
             FullIntPermutation::class.simpleName!! to ArrayList(),
         )
 
@@ -310,9 +309,8 @@ class FuzzyingTest {
 
     private fun runLongFuzz(useIterator: Boolean) {
         val pValuesByClass = mapOf<String, MutableList<Double>>(
-            ArrayLongPermutation::class.simpleName!! to ArrayList(),
-            HalfLongPermutation::class.simpleName!! to ArrayList(),
-            ULongPermutation::class.simpleName!! to ArrayList(),
+            SmallLongPermutation::class.simpleName!! to ArrayList(),
+            BoundedLongPermutation::class.simpleName!! to ArrayList(),
             FullLongPermutation::class.simpleName!! to ArrayList(),
         )
 

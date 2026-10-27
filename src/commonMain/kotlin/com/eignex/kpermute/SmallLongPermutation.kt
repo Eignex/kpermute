@@ -12,7 +12,7 @@ import kotlin.random.Random
  * @param [rng] Random generator used to create the shuffled mapping.
  * @throws IllegalArgumentException if [size] is negative or exceeds [Int.MAX_VALUE].
  */
-class ArrayLongPermutation(override val size: Long, rng: Random) : LongPermutation {
+class SmallLongPermutation(override val size: Long, rng: Random) : LongPermutation {
     private val array: LongArray
     private val inverse: LongArray
 
@@ -36,5 +36,5 @@ class ArrayLongPermutation(override val size: Long, rng: Random) : LongPermutati
         array.sliceArray(offset.toInt()..<size.toInt()).iterator()
     }
 
-    override fun toString(): String = "ArrayLongPermutation(size=$size)"
+    override fun toString(): String = "SmallLongPermutation(size=$size)"
 }
