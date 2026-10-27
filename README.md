@@ -74,8 +74,8 @@ The size selects the domain 0 until size. A size of -1 means every 32- or
 Sizes up to 4096 use a shuffled lookup table. Larger sizes mix within the
 enclosing power-of-two block and use
 [cycle-walking](https://web.cs.ucdavis.edu/~rogaway/papers/subset.pdf),
-repeating until the output is in range. The full 32- or 64-bit domain mixes directly. Range
-factories wrap any of these in a view over a non-empty range.
+repeating until the output is in range. The full 32- or 64-bit domain mixes
+directly. Range factories wrap any of these in a view over a non-empty range.
 
 Each mixing round multiplies by an odd constant, adds or xors a per-round key,
 and xor-shifts the value right, in the style of
