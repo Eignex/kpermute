@@ -140,10 +140,10 @@ class FuzzyingTest {
         val usize = size.toUInt()
 
         val offset: Int =
-            if (size > 0) {
-                rng.nextInt(size)
-            } else {
-                rng.nextInt()
+            when {
+                size > 0 -> rng.nextInt(size)
+                size == -1 -> rng.nextInt()
+                else -> rng.nextUInt(usize).toInt()
             }
 
         var i = offset
@@ -262,10 +262,10 @@ class FuzzyingTest {
         val usize = size.toULong()
 
         val offset: Long =
-            if (size > 0L) {
-                rng.nextLong(size)
-            } else {
-                rng.nextLong()
+            when {
+                size > 0L -> rng.nextLong(size)
+                size == -1L -> rng.nextLong()
+                else -> rng.nextULong(usize).toLong()
             }
 
         var i = offset

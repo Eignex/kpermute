@@ -1,5 +1,19 @@
 package com.eignex.kpermute
 
+/** Requires an iterator [offset] in `0..size`, comparing both as unsigned. */
+internal fun checkOffset(offset: Int, size: Int) {
+    require(offset.toUInt() <= size.toUInt()) {
+        "offset ${offset.toUInt()} out of range [0, ${size.toUInt()}]"
+    }
+}
+
+/** Requires an iterator [offset] in `0..size`, comparing both as unsigned. */
+internal fun checkOffset(offset: Long, size: Long) {
+    require(offset.toULong() <= size.toULong()) {
+        "offset ${offset.toULong()} out of range [0, ${size.toULong()}]"
+    }
+}
+
 internal object PermMathInt {
     /** k = min s.t. 2^k >= size (size in 1..2^31), mask = (2^k - 1), rshift ~= k*3/7 */
     fun block(sizeExclusive: Int): Triple<Int, Int, Int> {

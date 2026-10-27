@@ -23,6 +23,12 @@ class FullLongPermutation(
 
     override val size: Long get() = -1L
 
+    init {
+        require(rounds > 0) { "rounds must be > 0" }
+        require(c1 and 1L == 1L) { "c1 must be odd" }
+        require(c2 and 1L == 1L) { "c2 must be odd" }
+    }
+
     private val k1: LongArray = LongArray(rounds) { rng.nextLong() }
     private val k2: LongArray = LongArray(rounds) { rng.nextLong() }
     private val c1Inv: Long = PermMathLong.invOdd64(c1, -1L)

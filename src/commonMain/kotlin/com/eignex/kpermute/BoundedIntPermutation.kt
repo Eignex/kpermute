@@ -29,7 +29,6 @@ class BoundedIntPermutation(
     private val mask: UInt
     private val kBits: Int
     private val rshift: Int
-    private val keys: UIntArray = UIntArray(rounds) { rng.nextInt().toUInt() }
     private val invConst: UInt
 
     init {
@@ -44,16 +43,21 @@ class BoundedIntPermutation(
         invConst = PermMathUInt.invOdd32(const, mask)
     }
 
+    // Declared after init so invalid rounds fail its require first.
+    private val keys: UIntArray = UIntArray(rounds) { rng.nextInt().toUInt() }
+
+    // Overrides the interface check, which treats size == -1 as the full
+    // domain; here -1 means 2^32 - 1 values like any other unsigned size.
     override fun encode(value: Int): Int {
         require(value.toUInt() < usize) {
-            "value ${value.toUInt()} out of range [0, $usize)"
+            "value $value out of range [0, $usize)"
         }
         return encodeUnchecked(value)
     }
 
     override fun decode(encoded: Int): Int {
         require(encoded.toUInt() < usize) {
-            "encoded ${encoded.toUInt()} out of range [0, $usize)"
+            "encoded $encoded out of range [0, $usize)"
         }
         return decodeUnchecked(encoded)
     }
@@ -83,6 +87,7 @@ class BoundedIntPermutation(
     }
 
     override fun iterator(offset: Int): IntIterator {
+        checkOffset(offset, size)
         var i = offset.toUInt()
         return object : IntIterator() {
             override fun hasNext() = i < usize

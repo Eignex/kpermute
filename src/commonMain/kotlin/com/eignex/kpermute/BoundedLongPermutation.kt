@@ -29,8 +29,6 @@ class BoundedLongPermutation(
     private val mask: ULong
     private val kBits: Int
     private val rshift: Int
-    private val keys: ULongArray =
-        ULongArray(rounds) { rng.nextLong().toULong() }
     private val invConst: ULong
 
     init {
@@ -45,16 +43,22 @@ class BoundedLongPermutation(
         invConst = PermMathULong.invOdd64(const, mask)
     }
 
+    // Declared after init so invalid rounds fail its require first.
+    private val keys: ULongArray =
+        ULongArray(rounds) { rng.nextLong().toULong() }
+
+    // Overrides the interface check, which treats size == -1 as the full
+    // domain; here -1 means 2^64 - 1 values like any other unsigned size.
     override fun encode(value: Long): Long {
         require(value.toULong() < usize) {
-            "value ${value.toULong()} out of range [0, $usize)"
+            "value $value out of range [0, $usize)"
         }
         return encodeUnchecked(value)
     }
 
     override fun decode(encoded: Long): Long {
         require(encoded.toULong() < usize) {
-            "encoded ${encoded.toULong()} out of range [0, $usize)"
+            "encoded $encoded out of range [0, $usize)"
         }
         return decodeUnchecked(encoded)
     }
@@ -84,6 +88,7 @@ class BoundedLongPermutation(
     }
 
     override fun iterator(offset: Long): LongIterator {
+        checkOffset(offset, size)
         var i = offset.toULong()
         return object : LongIterator() {
             override fun hasNext() = i < usize
