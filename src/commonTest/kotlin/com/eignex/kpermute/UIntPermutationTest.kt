@@ -55,4 +55,32 @@ class UIntPermutationTest {
         val p = UIntPermutation(n, Random(1))
         CommonAssertsInt.assertRangeChecks(p, n)
     }
+
+    @Test
+    fun unsignedIntDomainsPreserveValuesOnBothSidesOfTheSignBit() {
+        for (size in listOf(Int.MIN_VALUE, Int.MIN_VALUE + 1, -2)) {
+            for (seed in listOf(0L, 42L, Long.MIN_VALUE)) {
+                val perm = UIntPermutation(size, Random(seed))
+                val samples = listOf(0, 1, Int.MAX_VALUE - 1, Int.MAX_VALUE, Int.MIN_VALUE, size - 1)
+                    .filter { it.toUInt() < size.toUInt() }
+                for (value in samples) {
+                    val context = "size=$size seed=$seed value=$value"
+                    assertTrue(perm.encode(value).toUInt() < size.toUInt(), context)
+                    assertTrue(perm.decode(value).toUInt() < size.toUInt(), context)
+                    assertEquals(value, perm.decode(perm.encode(value)), context)
+                    assertEquals(value, perm.encode(perm.decode(value)), context)
+                }
+                val iterator = perm.iterator(size - 2)
+                for (value in listOf(size - 2, size - 1)) {
+                    assertTrue(iterator.hasNext())
+                    assertEquals(perm.encode(value), iterator.nextInt())
+                }
+                assertFalse(iterator.hasNext())
+                assertFailsWith<NoSuchElementException> { iterator.nextInt() }
+                val end = perm.iterator(size)
+                assertFalse(end.hasNext())
+                assertFailsWith<NoSuchElementException> { end.nextInt() }
+            }
+        }
+    }
 }

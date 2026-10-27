@@ -200,4 +200,62 @@ class LongPermutationsTest {
         assertTrue(list.all { it in 5L..9L })
         assertEquals(5, list.toSet().size)
     }
+
+    @Test
+    fun longRangesTranslateBothDirectionsAtSignedBoundaries() {
+        val ranges = listOf(
+            Long.MIN_VALUE..Long.MIN_VALUE + 16,
+            -8L..8L,
+            Long.MAX_VALUE - 16..Long.MAX_VALUE,
+            Long.MIN_VALUE..Long.MIN_VALUE,
+            Long.MAX_VALUE..Long.MAX_VALUE,
+        )
+        for (range in ranges) {
+            val base = longPermutation(range.count().toLong(), seed = 42)
+            val wrapped = base.range(range)
+            val factory = longPermutation(range, seed = 42)
+            for ((index, value) in range.withIndex()) {
+                val encoded = range.first + base.encode(index.toLong())
+                val decoded = range.first + base.decode(index.toLong())
+                assertEquals(encoded, wrapped.encode(value), "range=$range value=$value")
+                assertEquals(decoded, wrapped.decode(value), "range=$range value=$value")
+                assertEquals(encoded, factory.encode(value))
+                assertEquals(decoded, factory.decode(value))
+                assertEquals(encoded, wrapped.encodeUnchecked(value))
+                assertEquals(decoded, wrapped.decodeUnchecked(value))
+            }
+            for (outside in listOf(-9L, 9L, Long.MIN_VALUE, Long.MAX_VALUE).filter { it !in range }) {
+                assertFailsWith<IllegalArgumentException> { wrapped.encode(outside) }
+                assertFailsWith<IllegalArgumentException> { wrapped.decode(outside) }
+            }
+        }
+    }
+
+    @Test
+    fun longRangeIteratorUsesAnIndexOffsetAndStaysExhausted() {
+        val range = Long.MAX_VALUE - 16..Long.MAX_VALUE
+        val perm = longPermutation(range, seed = 42)
+        for (offset in listOf(0, 3, 16, 17)) {
+            val iterator = perm.iterator(offset.toLong())
+            for (value in range.drop(offset)) {
+                assertTrue(iterator.hasNext())
+                assertTrue(iterator.hasNext(), "hasNext must not consume an element")
+                assertEquals(perm.encode(value), iterator.nextLong())
+            }
+            repeat(2) {
+                assertFalse(iterator.hasNext())
+                assertFailsWith<NoSuchElementException> { iterator.nextLong() }
+            }
+        }
+        assertFailsWith<IllegalArgumentException> { perm.iterator(-1L) }
+        assertFailsWith<IllegalArgumentException> { perm.iterator(18L) }
+    }
+
+    @Test
+    fun wrappersRejectMismatchedLengthsAndNonFiniteBases() {
+        assertFailsWith<IllegalArgumentException> { longPermutation(5L, seed = 42).range(-2L..3L) }
+        for (size in listOf(-1L, -2L)) {
+            assertFailsWith<IllegalArgumentException> { longPermutation(size, seed = 42).range(0L..4L) }
+        }
+    }
 }
