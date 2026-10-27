@@ -18,15 +18,12 @@ class BoundedIntPermutationTest {
     fun iteratorFullAndOffsetsEdgeCases() {
         val n = 5
         val p = BoundedIntPermutation(n, Random(1))
-        // full
         CommonAssertsInt.assertIteratorMatchesEncode(p, n)
-        // offset == last index → one element then end
         val itLast = p.iterator(n - 1)
         assertTrue(itLast.hasNext())
         assertEquals(p.encode(n - 1), itLast.nextInt())
         assertFalse(itLast.hasNext())
         assertFailsWith<NoSuchElementException> { itLast.nextInt() }
-        // offset == size → empty and throws on next
         val itEmpty = p.iterator(n)
         assertFalse(itEmpty.hasNext())
         assertFailsWith<NoSuchElementException> { itEmpty.nextInt() }
@@ -124,7 +121,6 @@ class BoundedIntPermutationTest {
             assertFailsWith<IllegalArgumentException>("offset=$offset") { p.iterator(offset) }
         }
         assertFalse(p.iterator(17).hasNext())
-        // Unsigned sizes accept offsets above the signed maximum.
         val unsigned = BoundedIntPermutation(-2, Random(1))
         assertTrue(unsigned.iterator(-3).hasNext())
         assertFailsWith<IllegalArgumentException> { unsigned.iterator(-1) }
@@ -132,7 +128,7 @@ class BoundedIntPermutationTest {
 
     @Test
     fun smallSeedsWithSharedLowKeyBitsGiveDistinctPermutations() {
-        // Random(4526) and Random(8192) emit keys that share their low 8 bits.
+        // These seeds emit keys sharing their low 8 bits.
         val a = BoundedIntPermutation(100, Random(4526L))
         val b = BoundedIntPermutation(100, Random(8192L))
         assertNotEquals(a.toList(), b.toList())

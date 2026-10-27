@@ -11,7 +11,7 @@ class JavaOverloadsTest {
 
     @Test
     fun seedOverloadsDoNotShadowSizeOverloads() {
-        // From Java, intPermutation(5L) must not compile as "seed 5".
+        // intPermutation(5L) must not compile as "seed 5".
         assertFalse("intPermutation" to listOf(Long::class.javaPrimitiveType) in methods)
         assertTrue("longPermutation" to listOf(Long::class.javaPrimitiveType) in methods)
     }

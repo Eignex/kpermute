@@ -1,61 +1,23 @@
 package com.eignex.kpermute
 
 /**
- * Reversible permutation over a 64-bit integer domain.
+ * Bijection on `[0, size)`, or on all 64-bit values when `size == -1L`.
+ * [size] is read as unsigned. [decode] is the exact inverse of [encode].
  *
- * A [LongPermutation] defines a bijection on either:
- * - a finite domain `[0, size)` when `size != -1L`, with [size] read as
- *   unsigned so negative values select domains above the signed maximum, or
- * - the full signed 64-bit space when `size == -1L`.
- *
- * Implementations are deterministic: the same instance always maps the same
- * input to the same output, and [decode] is the exact inverse of [encode].
- * They are suitable for repeatable shuffling, masking, and index remapping
- * without full lookup tables.
- *
- * Security note:
- * These permutations are not cryptographic. They are not PRPs and are not
- * intended to resist adversarial inversion or analysis.
- *
- * Contract:
- * - For finite domains (`size != -1L`), valid inputs to [encode] and [decode]
- *   are in `[0, size)`, compared as unsigned. Out-of-range values trigger
- *   [IllegalArgumentException].
- * - [encodeUnchecked] and [decodeUnchecked] skip range checks and must only
- *   be called with valid domain values when `size != -1L`. Other values give
- *   unspecified results, and cycle-walking implementations may never return.
- * - [iterator] yields `encode(i)` for all valid `i` in index order.
- *
- * Use [longPermutation] to construct concrete implementations.
+ * Not cryptographic. Construct with [longPermutation].
  */
 interface LongPermutation : Iterable<Long> {
 
-    /**
-     * Domain size of the permutation.
-     *
-     * - `size != -1L`: finite domain `[0, size)`, with [size] read as unsigned.
-     * - `size == -1L`: full signed 64-bit domain.
-     */
+    /** Domain size, read as unsigned; `-1L` means all 64-bit values. */
     val size: Long
 
-    /**
-     * Encodes a [value] without range checks.
-     * Out-of-domain input gives an unspecified result and may not terminate.
-     */
+    /** [encode] without range checks. Out-of-domain input is unspecified and may not terminate. */
     fun encodeUnchecked(value: Long): Long
 
-    /**
-     * Decodes a previously [encoded] value without range checks.
-     * Out-of-domain input gives an unspecified result and may not terminate.
-     */
+    /** [decode] without range checks. Out-of-domain input is unspecified and may not terminate. */
     fun decodeUnchecked(encoded: Long): Long
 
-    /**
-     * Encodes a long in the permutation domain into its permuted value.
-     *
-     * For finite domains (`size != -1L`), [value] must be in `[0, size)`,
-     * compared as unsigned.
-     */
+    /** Maps [value] to its permuted position; throws if [value] is outside the domain. */
     fun encode(value: Long): Long {
         if (size != -1L) {
             require(value.toULong() < size.toULong()) {
@@ -65,12 +27,7 @@ interface LongPermutation : Iterable<Long> {
         return encodeUnchecked(value)
     }
 
-    /**
-     * Decodes a previously encoded long back to its original value.
-     *
-     * For finite domains (`size != -1L`), [encoded] must be in `[0, size)`,
-     * compared as unsigned.
-     */
+    /** Inverse of [encode]; throws if [encoded] is outside the domain. */
     fun decode(encoded: Long): Long {
         if (size != -1L) {
             require(encoded.toULong() < size.toULong()) {
@@ -80,18 +37,9 @@ interface LongPermutation : Iterable<Long> {
         return decodeUnchecked(encoded)
     }
 
-    /**
-     * Returns an iterator over `encode(i)` for all `i` in `[0, size)` for
-     * finite domains, or over the full 64-bit space when `size == -1L`.
-     */
+    /** Iterates `encode(i)` over the whole domain in index order. */
     override fun iterator(): LongIterator = iterator(0)
 
-    /**
-     * Returns an iterator over `encode(i)` for indices in `[offset, size)`.
-     *
-     * For finite domains, [offset] is an index in `0..size`, compared as
-     * unsigned; other offsets throw [IllegalArgumentException]. For full-domain
-     * implementations, semantics are defined by the implementation.
-     */
+    /** Iterates `encode(i)` for unsigned indices `i` from [offset], which must be in `0..size`. */
     fun iterator(offset: Long): LongIterator
 }

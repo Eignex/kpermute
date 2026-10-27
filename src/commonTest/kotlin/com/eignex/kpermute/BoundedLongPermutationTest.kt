@@ -19,17 +19,14 @@ class BoundedLongPermutationTest {
         val n = 5L
         val p = BoundedLongPermutation(n, Random(1))
 
-        // full
         CommonAssertsLong.assertIteratorMatchesEncode(p, n)
 
-        // offset == last index → one element then end
         val itLast = p.iterator(n - 1L)
         assertTrue(itLast.hasNext())
         assertEquals(p.encode(n - 1L), itLast.nextLong())
         assertFalse(itLast.hasNext())
         assertFailsWith<NoSuchElementException> { itLast.nextLong() }
 
-        // offset == size → empty and throws on next
         val itEmpty = p.iterator(n)
         assertFalse(itEmpty.hasNext())
         assertFailsWith<NoSuchElementException> { itEmpty.nextLong() }
@@ -127,7 +124,6 @@ class BoundedLongPermutationTest {
             assertFailsWith<IllegalArgumentException>("offset=$offset") { p.iterator(offset) }
         }
         assertFalse(p.iterator(17L).hasNext())
-        // Unsigned sizes accept offsets above the signed maximum.
         val unsigned = BoundedLongPermutation(-2L, Random(1))
         assertTrue(unsigned.iterator(-3L).hasNext())
         assertFailsWith<IllegalArgumentException> { unsigned.iterator(-1L) }

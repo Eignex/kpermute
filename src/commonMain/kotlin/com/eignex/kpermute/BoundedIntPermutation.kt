@@ -3,19 +3,11 @@ package com.eignex.kpermute
 import kotlin.random.Random
 
 /**
- * Finite permutation over `[0, size)` using cycle-walking over a 2^k block.
+ * Permutation over `[0, size)` that mixes within the enclosing power-of-two
+ * block and cycle-walks until the output lands in range. [size] is read as
+ * unsigned, so `-1` means 2^32 - 1 values.
  *
- * Applies reversible affine steps and XOR-shift mixing within the smallest
- * power-of-two block containing the domain, and walks outputs outside
- * `[0, size)` until they fall back inside. [size] is read as unsigned, so
- * negative values select domains larger than the signed Int maximum.
- * [encode] and [decode] reject inputs whose unsigned representation is outside
- * `[0, size.toUInt())`.
- *
- * @property [size] Domain size, read as an unsigned 32-bit value.
- * @param [rng] Random generator used to derive per-round keys.
- * @param [rounds] Number of mixing rounds; higher values increase dispersion.
- * @param [const] Odd multiplicative constant used in each affine step.
+ * @param const odd multiplier for the affine steps.
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 class BoundedIntPermutation(
@@ -43,13 +35,11 @@ class BoundedIntPermutation(
         invConst = PermMathUInt.invOdd32(const, mask)
     }
 
-    // Declared after init so invalid rounds fail its require first. Keys take
-    // the high bits of nextInt, since the low bits of Random(seed) outputs
-    // collide across small seeds and only kBits of each key are used.
+    // After init so the rounds check runs first. High bits, since low bits of
+    // Random(seed) collide across small seeds.
     private val keys: UIntArray = UIntArray(rounds) { rng.nextInt().toUInt() shr (32 - kBits) }
 
-    // Overrides the interface check, which treats size == -1 as the full
-    // domain; here -1 means 2^32 - 1 values like any other unsigned size.
+    // The interface check treats size -1 as the full domain.
     override fun encode(value: Int): Int {
         require(value.toUInt() < usize) {
             "value $value out of range [0, $usize)"

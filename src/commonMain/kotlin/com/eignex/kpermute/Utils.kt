@@ -1,13 +1,13 @@
 package com.eignex.kpermute
 
-/** Requires an iterator [offset] in `0..size`, comparing both as unsigned. */
+/** Requires [offset] in `0..size`, unsigned. */
 internal fun checkOffset(offset: Int, size: Int) {
     require(offset.toUInt() <= size.toUInt()) {
         "offset ${offset.toUInt()} out of range [0, ${size.toUInt()}]"
     }
 }
 
-/** Requires an iterator [offset] in `0..size`, comparing both as unsigned. */
+/** Requires [offset] in `0..size`, unsigned. */
 internal fun checkOffset(offset: Long, size: Long) {
     require(offset.toULong() <= size.toULong()) {
         "offset ${offset.toULong()} out of range [0, ${size.toULong()}]"
@@ -15,14 +15,14 @@ internal fun checkOffset(offset: Long, size: Long) {
 }
 
 internal object PermMathInt {
-    /** k = min s.t. 2^k >= size (size in 1..2^31), mask = (2^k - 1), rshift ~= k*3/7 */
+    /** Smallest k with 2^k >= size; returns (2^k - 1, k, k*3/7). */
     fun block(sizeExclusive: Int): Triple<Int, Int, Int> {
         val k = if (sizeExclusive <= 1) {
             1
         } else {
             32 - (sizeExclusive - 1).countLeadingZeroBits()
         }
-        val mask = -1 ushr (32 - k) // avoids 1 shl 31 overflow
+        val mask = -1 ushr (32 - k)
         val rshift = ((k * 3) / 7).coerceAtLeast(1)
         return Triple(mask, k, rshift)
     }
@@ -38,16 +38,16 @@ internal object PermMathInt {
         return v and mask
     }
 
-    /** Multiplicative inverse of an odd 32-bit Int modulo 2^k (mask = 2^k-1). */
+    /** Inverse of odd [a] modulo `mask + 1`. */
     fun invOdd32(a: Int, mask: Int): Int {
         var inv = 1
-        repeat(6) { inv *= (2 - a * inv) } // Newton iteration
+        repeat(6) { inv *= (2 - a * inv) }
         return inv and mask
     }
 }
 
 internal object PermMathUInt {
-    /** k = min s.t. 2^k >= size, mask = (2^k - 1) (k in 1..32). */
+    /** Smallest k with 2^k >= size; returns (2^k - 1, k, k*3/7). */
     fun block(sizeExclusive: UInt): Triple<UInt, Int, Int> {
         val k = if (sizeExclusive <= 1u) {
             1
@@ -70,7 +70,7 @@ internal object PermMathUInt {
         return v and mask
     }
 
-    /** Multiplicative inverse of an odd UInt modulo 2^k (mask = 2^k-1). */
+    /** Inverse of odd [a] modulo `mask + 1`. */
     fun invOdd32(a: UInt, mask: UInt): UInt {
         var inv = 1u
         repeat(6) { inv = (inv * (2u - a * inv)) and mask }
@@ -79,7 +79,7 @@ internal object PermMathUInt {
 }
 
 internal object PermMathLong {
-    /** k = min s.t. 2^k >= size (size in 1..2^63), mask = (2^k - 1), rshift ~= k*3/7 */
+    /** Smallest k with 2^k >= size; returns (2^k - 1, k, k*3/7). */
     fun block(sizeExclusive: Long): Triple<Long, Int, Int> {
         val k = if (sizeExclusive <= 1L) {
             1
@@ -102,17 +102,16 @@ internal object PermMathLong {
         return v and mask
     }
 
-    /** Multiplicative inverse of an odd 64-bit Long modulo 2^k (mask = 2^k-1). */
+    /** Inverse of odd [a] modulo `mask + 1`. */
     fun invOdd64(a: Long, mask: Long): Long {
         var inv = 1L
-        // 6 iterations are enough for 64 bits (1 → 2 → 4 → 8 → 16 → 32 → 64)
         repeat(6) { inv *= (2L - a * inv) }
         return inv and mask
     }
 }
 
 internal object PermMathULong {
-    /** k = min s.t. 2^k >= size, mask = (2^k - 1) (k in 1..64). */
+    /** Smallest k with 2^k >= size; returns (2^k - 1, k, k*3/7). */
     fun block(sizeExclusive: ULong): Triple<ULong, Int, Int> {
         val k = if (sizeExclusive <= 1uL) {
             1
@@ -135,7 +134,7 @@ internal object PermMathULong {
         return v and mask
     }
 
-    /** Multiplicative inverse of an odd ULong modulo 2^k (mask = 2^k-1). */
+    /** Inverse of odd [a] modulo `mask + 1`. */
     fun invOdd64(a: ULong, mask: ULong): ULong {
         var inv = 1uL
         repeat(6) { inv = (inv * (2uL - a * inv)) and mask }

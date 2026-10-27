@@ -15,16 +15,9 @@ class FuzzyingTest {
         var size: Int
         do {
             size = when (rng.nextInt(4)) {
-                // SmallIntPermutation
                 0 -> rng.nextInt(17)
-
-                // BoundedIntPermutation (size > 16)
                 1 -> rng.nextInt()
-
-                // BoundedIntPermutation (size < 0)
                 2 -> rng.nextUInt().toInt()
-
-                // FullIntPermutation sentinel
                 else -> -1
             }
         } while (size == 0)
@@ -37,16 +30,9 @@ class FuzzyingTest {
         var size: Long
         do {
             size = when (rng.nextInt(4)) {
-                // SmallLongPermutation
                 0 -> rng.nextLong(17L)
-
-                // BoundedLongPermutation (size > 16)
                 1 -> rng.nextLong()
-
-                // BoundedLongPermutation (size < 0)
                 2 -> rng.nextULong().toLong()
-
-                // FullLongPermutation sentinel
                 else -> -1L
             }
         } while (size == 0L)
@@ -55,7 +41,7 @@ class FuzzyingTest {
         return Triple(longPermutation(size, Random(seed), rounds), seed, rounds)
     }
 
-    // Normal CDF approximation (Abramowitz–Stegun 7.1.26)
+    // Abramowitz–Stegun 7.1.26
     private fun normalCdf(x: Double): Double {
         val t = 1.0 / (1.0 + 0.2316419 * abs(x))
         val d = 0.3989423 * exp(-x * x / 2.0)

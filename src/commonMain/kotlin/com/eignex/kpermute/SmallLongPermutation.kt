@@ -2,16 +2,7 @@ package com.eignex.kpermute
 
 import kotlin.random.Random
 
-/**
- * Finite in-memory long permutation backed by a `LongArray` lookup table.
- *
- * Builds a random bijection over `[0, size)` by shuffling the identity mapping
- * and precomputing the inverse. Encode and decode are O(1) array lookups.
- *
- * @property [size] Size of the permutation domain; valid inputs are `[0, size)`.
- * @param [rng] Random generator used to create the shuffled mapping.
- * @throws IllegalArgumentException if [size] is negative or exceeds [Int.MAX_VALUE].
- */
+/** Permutation over `[0, size)` backed by shuffled lookup tables. */
 class SmallLongPermutation(override val size: Long, rng: Random) : LongPermutation {
     private val array: LongArray
     private val inverse: LongArray

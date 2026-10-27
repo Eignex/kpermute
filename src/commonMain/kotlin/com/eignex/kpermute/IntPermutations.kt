@@ -1,18 +1,8 @@
 package com.eignex.kpermute
 
 /**
- * Returns a read-only view of this list with its elements permuted by [perm].
- * The original list is not modified or copied. The view's size is fixed when
- * it is created, so the source list must not change size afterwards.
- *
- * [perm] must have the domain `[0, size)`; a range view of another domain is
- * rejected.
- *
- * Example:
- * ```
- * val perm = intPermutation(5, seed = 42)
- * val shuffled = listOf("a","b","c","d","e").permuted(perm)
- * ```
+ * Returns a read-only view of this list reordered by [perm], whose domain must
+ * be `[0, size)`. The view does not copy, so the source must not change size.
  */
 fun <T> List<T>.permuted(perm: IntPermutation = intPermutation(size)): List<T> {
     val n = size
@@ -23,10 +13,7 @@ fun <T> List<T>.permuted(perm: IntPermutation = intPermutation(size)): List<T> {
     }
 }
 
-/**
- * Applies the inverse of [perm] as a read-only view, restoring the original
- * order. The same requirements as [permuted] apply.
- */
+/** Inverse of [permuted]. */
 fun <T> List<T>.unpermuted(perm: IntPermutation): List<T> {
     val n = size
     requireIndexDomain(perm, n)
@@ -51,14 +38,8 @@ private fun checkIndex(index: Int, n: Int): Int {
 }
 
 /**
- * Returns a view of this permutation that operates on [range].
- * Requires a non-empty range with the same number of values as this
- * permutation's domain, which may be unsigned or the full 32-bit space.
- * Calling this on an existing range view replaces its range while preserving
- * the underlying permutation.
- *
- * Useful for permuting values within numeric subranges such as dataset shards,
- * sliding windows, or bounded ID segments without manual offset math.
+ * Returns a view of this permutation shifted onto [range], which must hold
+ * exactly [size] values. On an existing range view, replaces its range.
  */
 fun IntPermutation.range(range: IntRange): IntPermutation {
     require(!range.isEmpty()) { "range must be non-empty: $range" }
@@ -72,8 +53,7 @@ fun IntPermutation.range(range: IntRange): IntPermutation {
     return IntRangePermutation(base, range)
 }
 
-// Largest index of a non-empty domain; size -1 is the full domain unless it is
-// a bounded permutation, where it means 2^32 - 1 values.
+// Bounded permutations use size -1 for 2^32 - 1 values, not the full domain.
 private fun IntPermutation.lastIndex(): UInt = when {
     this is IntRangePermutation -> lastIndex
     size == -1 && this !is BoundedIntPermutation -> UInt.MAX_VALUE
@@ -99,7 +79,7 @@ private class IntRangePermutation(val base: IntPermutation, private val range: I
         return decodeUnchecked(encoded)
     }
 
-    // Offsets are unsigned indices in 0..size, independent of the range's start.
+    // Offsets are indices, not range values.
     override fun iterator(offset: Int): IntIterator {
         var i = offset.toUInt()
         require(lastIndex == UInt.MAX_VALUE || i <= lastIndex + 1u) {

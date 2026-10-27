@@ -78,14 +78,12 @@ class LongPermutationsTest {
 
     @Test
     fun longFactoryDefaultRoundsForHalfAllSizeBands() {
-        // (4096, 2^20]
         val medium = 5000L
         val pMedium =
             longPermutation(size = medium, rng = Random(2), rounds = 0)
         assertEquals(medium, pMedium.size)
         assertTrue(pMedium is BoundedLongPermutation)
 
-        // > 2^20
         val large = (1L shl 20) + 100L
         val pLarge = longPermutation(size = large, rng = Random(3), rounds = 0)
         assertEquals(large, pLarge.size)
@@ -94,7 +92,6 @@ class LongPermutationsTest {
 
     @Test
     fun longFactoryUsesLargestDefaultRoundsForUnsignedSizes() {
-        // Unsigned sizes are always above 2^63, so they get the top band.
         for (size in listOf(-2L, -10L, -((1L shl 16) + 100L), Long.MIN_VALUE)) {
             val p = longPermutation(size = size, rng = Random(1), rounds = 0)
             val expected = longPermutation(size = size, rng = Random(1), rounds = 6)
@@ -113,10 +110,8 @@ class LongPermutationsTest {
 
     @Test
     fun selectsImplementationBySizeSentinels() {
-        // Full domain sentinel
         assertTrue(longPermutation(-1L) is FullLongPermutation)
 
-        // Negative non-sentinel uses unsigned-domain variant
         assertTrue(longPermutation(-10L) is BoundedLongPermutation)
     }
 
@@ -125,7 +120,6 @@ class LongPermutationsTest {
         val size = 32L
         val p = longPermutation(size, seed = 1234L)
         assertEquals(size, p.size)
-        // Check bijection on small domain
         CommonAssertsLong.assertBijectionOverDomain(p, size)
     }
 
