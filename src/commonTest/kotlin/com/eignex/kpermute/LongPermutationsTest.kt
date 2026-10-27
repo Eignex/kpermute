@@ -346,4 +346,12 @@ class LongPermutationsTest {
             assertEquals(values, (0L until 8L).map { p.encode(it) }, "size=$size seed=$seed")
         }
     }
+
+    @Test
+    fun fullLongRangeReportsSizeOverflow() {
+        val e = assertFailsWith<IllegalArgumentException> {
+            longPermutation(Long.MIN_VALUE..Long.MAX_VALUE, seed = 1L)
+        }
+        assertTrue("exceeds Long.MAX_VALUE" in e.message!!, e.message)
+    }
 }

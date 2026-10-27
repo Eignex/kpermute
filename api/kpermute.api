@@ -104,12 +104,11 @@ public final class com/eignex/kpermute/LongPermutationsKt {
 public final class com/eignex/kpermute/Permutations {
 	public static final fun intPermutation ()Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (I)Lcom/eignex/kpermute/IntPermutation;
-	public static final fun intPermutation (IJ)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (IJI)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (ILkotlin/random/Random;)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (ILkotlin/random/Random;I)Lcom/eignex/kpermute/IntPermutation;
-	public static final fun intPermutation (J)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (Lkotlin/ranges/IntRange;)Lcom/eignex/kpermute/IntPermutation;
+	public static final fun intPermutation (Lkotlin/ranges/IntRange;J)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (Lkotlin/ranges/IntRange;JI)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (Lkotlin/ranges/IntRange;Lkotlin/random/Random;)Lcom/eignex/kpermute/IntPermutation;
 	public static final fun intPermutation (Lkotlin/ranges/IntRange;Lkotlin/random/Random;I)Lcom/eignex/kpermute/IntPermutation;

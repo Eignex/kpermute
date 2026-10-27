@@ -86,7 +86,7 @@ fun intPermutation(size: Int = Int.MAX_VALUE, rng: Random = Random.Default, roun
  *         when `size == -1`.
  * @see intPermutation
  */
-@JvmOverloads
+// No @JvmOverloads: a seed-only Java overload would read like longPermutation(size).
 fun intPermutation(size: Int = Int.MAX_VALUE, seed: Long, rounds: Int = 0): IntPermutation =
     intPermutation(size, Random(seed), rounds)
 
@@ -109,10 +109,8 @@ fun intPermutation(size: Int = Int.MAX_VALUE, seed: Long, rounds: Int = 0): IntP
  */
 @JvmOverloads
 fun intPermutation(range: IntRange, rng: Random = Random.Default, rounds: Int = 0): IntPermutation {
+    require(!range.isEmpty()) { "range must be non-empty and increasing: $range" }
     val nLong = range.last.toLong() - range.first.toLong() + 1L
-    require(nLong > 0L) {
-        "range must be non-empty and increasing: $range"
-    }
     require(nLong <= Int.MAX_VALUE.toLong()) {
         "range size $nLong exceeds Int.MAX_VALUE"
     }
@@ -133,6 +131,7 @@ fun intPermutation(range: IntRange, rng: Random = Random.Default, rounds: Int = 
  * @return an [IntPermutation] whose domain is exactly [range].
  * @see intPermutation
  */
+@JvmOverloads
 fun intPermutation(range: IntRange, seed: Long, rounds: Int = 0): IntPermutation =
     intPermutation(range, Random(seed), rounds)
 
@@ -224,8 +223,8 @@ fun longPermutation(size: Long = Long.MAX_VALUE, seed: Long, rounds: Int = 0): L
  * Creates a [LongPermutation] for values within the given inclusive [range].
  *
  * Internally this constructs a permutation over a domain of length
- * `range.last - range.first + 1`, then wraps it so that [IntPermutation.encode]
- * and [IntPermutation.decode] operate directly on values in [range].
+ * `range.last - range.first + 1`, then wraps it so that [LongPermutation.encode]
+ * and [LongPermutation.decode] operate directly on values in [range].
  *
  * The same implementation selection rules and default [rounds] logic as
  * [longPermutation] are used based on the range length.
@@ -240,12 +239,10 @@ fun longPermutation(size: Long = Long.MAX_VALUE, seed: Long, rounds: Int = 0): L
 @JvmOverloads
 fun longPermutation(range: LongRange, rng: Random = Random.Default, rounds: Int = 0): LongPermutation {
     require(!range.isEmpty()) { "range must be non-empty and increasing: $range" }
+    // Wraps to 0 for the full Long range, whose size is 2^64.
     val nULong = range.last.toULong() - range.first.toULong() + 1uL
-    require(nULong > 0uL) {
-        "range must be non-empty and increasing: $range"
-    }
-    require(nULong <= Long.MAX_VALUE.toULong()) {
-        "range size $nULong exceeds Long.MAX_VALUE"
+    require(nULong in 1uL..Long.MAX_VALUE.toULong()) {
+        "range size of $range exceeds Long.MAX_VALUE"
     }
     return longPermutation(nULong.toLong(), rng, rounds).range(range)
 }
