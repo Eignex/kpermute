@@ -1,7 +1,16 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    id("com.eignex.kmp") version "1.3.5"
+    id("com.eignex.kmp")
+}
+
+repositories {
+    ivy {
+        url = uri("https://github.com/Eignex/kbuild/releases/download")
+        patternLayout { artifact("v[revision]/[artifact]-[revision](-[classifier]).[ext]") }
+        metadataSources { gradleMetadata() }
+        content { includeModule("com.eignex", "kbuild-platform") }
+    }
 }
 
 eignexPublish {
@@ -11,7 +20,6 @@ eignexPublish {
     )
     githubRepo.set("Eignex/kpermute")
 }
-
 
 @OptIn(ExperimentalWasmDsl::class)
 kotlin {
