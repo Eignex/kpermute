@@ -46,10 +46,12 @@ jobs:
       - name: Validate the test report guard
         run: python3 .github/scripts/test-verification.py
 
+      # A stable private staging version preserves configuration-cache reuse across commits.
+      # The independent consumer treats only this local artifact as changing.
       # One graph shares compilation, lint, docs and publication artifacts.
       - name: Check library and stage publications
         env:
-          CONSUMER_VERSION: 0.0.0-ci.${{ github.sha }}
+          CONSUMER_VERSION: 0.0.0-ci
         run: >-
           ./gradlew check lintDocs koverXmlReport publishAllPublicationsToLocalStagingRepository
           -PciVersion="$CONSUMER_VERSION"
@@ -65,7 +67,7 @@ jobs:
 
       - name: Verify staged publications and independent consumers
         env:
-          CONSUMER_VERSION: 0.0.0-ci.${{ github.sha }}
+          CONSUMER_VERSION: 0.0.0-ci
         run: |
           python3 .github/scripts/verify-publication.py build/staging-repo "$CONSUMER_VERSION"
           bash .github/scripts/verify-consumer.sh "$CONSUMER_VERSION"

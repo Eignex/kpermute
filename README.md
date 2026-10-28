@@ -94,3 +94,9 @@ Linux job also covers JS, Wasm and WASI. Main and release validation additionall
 run the iOS ARM64 simulator. Native jobs run only their platform tests. JavaScript
 and Wasm dependency lockfiles under `kotlin-js-store/` must be committed; use
 `./gradlew kotlinUpgradeYarnLock kotlinWasmUpgradeYarnLock` when updating them.
+
+CI caches Gradle dependency/task outputs, the host-specific Native toolchain, and
+Gradle-encrypted configuration state separately. Configuration state is persisted
+only when the encryption secret is available. The local CI publication uses a
+stable version so source-only commits can reuse configuration state; the consumer
+always refreshes that local module, while external dependencies remain cached.
