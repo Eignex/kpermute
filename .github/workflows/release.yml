@@ -132,8 +132,10 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ~/.konan
-          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'gradle/*.versions.toml') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan-
+          key: ${{ runner.os }}-${{ runner.arch }}-konan-full-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'gradle/*.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-konan-full-
+            ${{ runner.os }}-${{ runner.arch }}-konan-
 
       - name: Build and Test
         if: env.IS_SNAPSHOT == 'false'

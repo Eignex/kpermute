@@ -50,6 +50,7 @@ jobs:
         uses: ./.github/actions/setup-build
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          target-profile: ${{ inputs.fullTargets && 'full' || 'default' }}
 
       - name: Validate the test report guard
         run: python3 .github/scripts/test-verification.py
@@ -137,6 +138,7 @@ jobs:
         uses: ./.github/actions/setup-build
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          target-profile: full
       # Native checks only: lint, coverage and web tests belong to the Linux job.
       - name: Run native tests
         shell: bash

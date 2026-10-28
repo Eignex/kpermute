@@ -4,6 +4,9 @@ inputs:
   cache-encryption-key:
     description: Encryption key for the Gradle configuration cache
     required: false
+  target-profile:
+    description: Separate cached Native and configuration state for normal and full targets
+    default: default
 runs:
   using: composite
   steps:
@@ -20,8 +23,10 @@ runs:
     - uses: actions/cache@v6
       with:
         path: ~/.konan
-        key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'gradle/*.versions.toml') }}
-        restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan-
+        key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ inputs.target-profile }}-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'gradle/*.versions.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-konan-${{ inputs.target-profile }}-
+          ${{ runner.os }}-${{ runner.arch }}-konan-
     # setup-gradle v6 caches Gradle User Home; persist project entries explicitly.
     # GRADLE_ENCRYPTION_KEY is exported by setup-gradle and Gradle encrypts these files.
     - name: Cache encrypted configuration state
@@ -31,5 +36,5 @@ runs:
         path: |
           .gradle/configuration-cache
           consumer/.gradle/configuration-cache
-        key: ${{ runner.os }}-${{ runner.arch }}-configuration-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-${{ runner.arch }}-configuration-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}-
+        key: ${{ runner.os }}-${{ runner.arch }}-configuration-${{ inputs.target-profile }}-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-${{ runner.arch }}-configuration-${{ inputs.target-profile }}-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', 'gradle/wrapper/gradle-wrapper.properties') }}-
