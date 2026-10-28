@@ -81,3 +81,16 @@ Each mixing round multiplies by an odd constant, adds or xors a per-round key,
 and xor-shifts the value right, in the style of
 [Jenkins' integer hashes](http://burtleburtle.net/bob/hash/integer.html).
 Every step is invertible.
+
+## Build validation
+
+Run `./gradlew check lintDocs koverXmlReport` for the full local gate. JVM checks
+also run the packaged JAR on Java 17 and 25. CI stages all target publications,
+checks their metadata and artifacts, and runs an independent Java consumer using
+both Gradle metadata and POM-only resolution.
+
+Pull requests run Linux, macOS ARM64 and Windows native checks in parallel; the
+Linux job also covers JS, Wasm and WASI. Main and release validation additionally
+run the iOS ARM64 simulator. Native jobs run only their platform tests. JavaScript
+and Wasm dependency lockfiles under `kotlin-js-store/` must be committed; use
+`./gradlew kotlinUpgradeYarnLock kotlinWasmUpgradeYarnLock` when updating them.

@@ -21,6 +21,16 @@ eignexPublish {
     githubRepo.set("Eignex/kpermute")
 }
 
+// Run the real JVM artifact on both the supported floor and the current LTS.
+eignexBuild {
+    packagedTestJdks.set(listOf(17, 25))
+}
+
+tasks.withType<org.gradle.api.tasks.testing.AbstractTestTask>().configureEach {
+    // Do not reuse results produced with the old aggregate-only failure policy.
+    inputs.property("kotlin.tests.individualTaskReports", providers.gradleProperty("kotlin.tests.individualTaskReports"))
+}
+
 @OptIn(ExperimentalWasmDsl::class)
 kotlin {
     jvm()
@@ -42,4 +52,9 @@ dokka {
             remoteLineSuffix.set("#L")
         }
     }
+}
+
+// Select an installed simulator in CI rather than relying on a particular iPhone model.
+tasks.withType<org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest>().configureEach {
+    providers.gradleProperty("iosSimulatorDevice").orNull?.let { device.set(it) }
 }

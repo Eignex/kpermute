@@ -137,6 +137,12 @@ jobs:
       - name: Build and Test
         if: env.IS_SNAPSHOT == 'false'
         run: ./gradlew build -PciVersion="$RELEASE_VERSION"
+      - name: Verify release publication
+        if: env.IS_SNAPSHOT == 'false'
+        run: |
+          ./gradlew publishAllPublicationsToLocalStagingRepository -PciVersion="$RELEASE_VERSION"
+          python3 .github/scripts/verify-publication.py build/staging-repo "$RELEASE_VERSION"
+          bash .github/scripts/verify-consumer.sh "$RELEASE_VERSION"
       - name: Upload test reports
         if: always() && env.IS_SNAPSHOT == 'false'
         uses: actions/upload-artifact@v7

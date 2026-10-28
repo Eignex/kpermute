@@ -38,34 +38,42 @@ jobs:
           persist-credentials: false
           fetch-depth: 2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v6
+      - name: Set up build
+        uses: ./.github/actions/setup-build
         with:
-          distribution: temurin
-          java-version: 25
-
-      # Build jobs persist dependency and encrypted configuration caches.
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-read-only: false
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
-      - name: Cache Kotlin/Native toolchain
-        uses: actions/cache@v6
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', '**/gradle-wrapper.properties', '**/*.versions.toml') }}
-          restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan-
+      - name: Validate the test report guard
+        run: python3 .github/scripts/test-verification.py
 
-      - name: Grant execute permission for Gradle
-        run: chmod +x gradlew
+      # One graph shares compilation, lint, docs and publication artifacts.
+      - name: Check library and stage publications
+        env:
+          CONSUMER_VERSION: 0.0.0-ci.${{ github.sha }}
+        run: >-
+          ./gradlew check lintDocs koverXmlReport publishAllPublicationsToLocalStagingRepository
+          -PciVersion="$CONSUMER_VERSION"
 
-      - name: Run linter
-        run: ./gradlew lintDocs
+      - name: Require executed tests on every Linux runtime
+        run: >-
+          python3 .github/scripts/verify-test-results.py
+          build/test-results/jvmTest
+          build/test-results/jvmTestJarOnJava17 build/test-results/jvmTestJarOnJava25
+          build/test-results/jsBrowserTest build/test-results/jsNodeTest
+          build/test-results/wasmJsBrowserTest build/test-results/wasmJsNodeTest
+          build/test-results/wasmWasiNodeTest build/test-results/linuxX64Test
 
-      - name: Run tests with coverage
-        run: ./gradlew check koverXmlReport
+      - name: Verify staged publications and independent consumers
+        env:
+          CONSUMER_VERSION: 0.0.0-ci.${{ github.sha }}
+        run: |
+          python3 .github/scripts/verify-publication.py build/staging-repo "$CONSUMER_VERSION"
+          bash .github/scripts/verify-consumer.sh "$CONSUMER_VERSION"
+
+      - name: Require committed JavaScript and Wasm lockfiles
+        run: |
+          git diff --exit-code -- kotlin-js-store
+          test -z "$(git ls-files --others --exclude-standard -- kotlin-js-store)"
 
       - name: Upload test reports
         if: always()
@@ -84,3 +92,55 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: build/reports/kover/report.xml
           fail_ci_if_error: false
+
+  native:
+    name: Native tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15
+            target: macosArm64
+            python: python3
+          - os: windows-latest
+            target: mingwX64
+            python: python
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - name: Set up build
+        uses: ./.github/actions/setup-build
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      # Native checks only: lint, coverage and web tests belong to the Linux job.
+      - name: Run native tests
+        shell: bash
+        run: ./gradlew ${{ matrix.target }}Test --max-workers=2 -Pkotlin.native.parallelThreads=2
+      - name: Require executed native tests
+        shell: bash
+        run: ${{ matrix.python }} .github/scripts/verify-test-results.py build/test-results/${{ matrix.target }}Test
+      # Simulator boot/linking stays off the PR path. Main and release validation cover iOS.
+      - name: Run iOS simulator tests
+        if: runner.os == 'macOS' && github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          device=$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]
+          print(next(d["udid"] for runtime, items in devices.items() if ".iOS-" in runtime
+                     for d in items if d["name"].startswith("iPhone")))')
+          ./gradlew iosSimulatorArm64Test --max-workers=2 -Pkotlin.native.parallelThreads=2 -PiosSimulatorDevice="$device"
+          python3 .github/scripts/verify-test-results.py build/test-results/iosSimulatorArm64Test
+      - name: Upload native test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-${{ matrix.target }}
+          path: |
+            build/reports/tests/
+            build/test-results/
+          if-no-files-found: ignore

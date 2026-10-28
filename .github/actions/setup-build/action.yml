@@ -1,0 +1,24 @@
+name: Set up library build
+description: Install the JVM runtimes and restore Gradle and Kotlin Native caches.
+inputs:
+  cache-encryption-key:
+    description: Encryption key for the Gradle configuration cache
+    required: false
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v6
+      with:
+        distribution: temurin
+        java-version: |
+          17
+          25
+    - uses: gradle/actions/setup-gradle@v6
+      with:
+        cache-read-only: false
+        cache-encryption-key: ${{ inputs.cache-encryption-key }}
+    - uses: actions/cache@v6
+      with:
+        path: ~/.konan
+        key: ${{ runner.os }}-${{ runner.arch }}-konan-${{ hashFiles('**/*.gradle.kts', '**/gradle.properties', '**/gradle-wrapper.properties', '**/*.versions.toml') }}
+        restore-keys: ${{ runner.os }}-${{ runner.arch }}-konan-
