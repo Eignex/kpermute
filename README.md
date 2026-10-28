@@ -84,16 +84,22 @@ Every step is invertible.
 
 ## Build validation
 
-Run `./gradlew check lintDocs koverXmlReport` for the full local gate. JVM checks
-also run the packaged JAR on Java 17 and 25. CI stages all target publications,
+`./gradlew check lintDocs koverXmlReport` checks JVM and Linux x64.
+JS, Wasm, WASI and other native targets are configured only with `-Ptargets.full`. JVM checks also
+run the packaged JAR on Java 17 and 25. CI stages the configured publications,
 checks their metadata and artifacts, and runs an independent Java consumer using
 both Gradle metadata and POM-only resolution.
 
-Pull requests run Linux, macOS ARM64 and Windows native checks in parallel; the
-Linux job also covers JS, Wasm and WASI. Main and release validation additionally
-run the iOS ARM64 simulator. Native jobs run only their platform tests. JavaScript
-and Wasm dependency lockfiles under `kotlin-js-store/` must be committed; use
-`./gradlew kotlinUpgradeYarnLock kotlinWasmUpgradeYarnLock` when updating them.
+Normal pull-request and main builds use one Linux job. Tagged releases and release
+dry runs enable `-Ptargets.full`, with focused macOS ARM64, iOS simulator and Windows
+checks. The build workflow's manual `fullTargets` input enables the same full gate.
+Automatic snapshots publish all targets without repeating the full runtime gate.
+
+ABI references live in `api/` for normal checks and `api-full/` for full checks.
+When intentionally updating the API, run `./gradlew updateKotlinAbi` and
+`./gradlew updateKotlinAbi -Ptargets.full`. JavaScript and Wasm dependency lockfiles
+under `kotlin-js-store/` must be committed; use
+`./gradlew kotlinUpgradeYarnLock kotlinWasmUpgradeYarnLock -Ptargets.full` to update them.
 
 CI caches Gradle dependency/task outputs, the host-specific Native toolchain, and
 Gradle-encrypted configuration state separately. Configuration state is persisted

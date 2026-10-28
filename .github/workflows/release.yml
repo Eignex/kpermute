@@ -93,6 +93,7 @@ jobs:
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ needs.prepare.outputs.revision }}
+      fullTargets: true
     secrets:
       GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
@@ -136,12 +137,12 @@ jobs:
 
       - name: Build and Test
         if: env.IS_SNAPSHOT == 'false'
-        run: ./gradlew build -PciVersion="$RELEASE_VERSION"
+        run: ./gradlew build -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Verify release publication
         if: env.IS_SNAPSHOT == 'false'
         run: |
-          ./gradlew publishAllPublicationsToLocalStagingRepository -PciVersion="$RELEASE_VERSION"
-          python3 .github/scripts/verify-publication.py build/staging-repo "$RELEASE_VERSION"
+          ./gradlew publishAllPublicationsToLocalStagingRepository -Ptargets.full -PciVersion="$RELEASE_VERSION"
+          python3 .github/scripts/verify-publication.py build/staging-repo "$RELEASE_VERSION" --full
           bash .github/scripts/verify-consumer.sh "$RELEASE_VERSION"
       - name: Upload test reports
         if: always() && env.IS_SNAPSHOT == 'false'
@@ -159,7 +160,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishToMavenCentral -PciVersion="$RELEASE_VERSION"
+        run: ./gradlew publishToMavenCentral -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Publish to Sonatype Snapshots
         if: env.IS_SNAPSHOT == 'true' && env.DRY_RUN != 'true'
         env:
@@ -167,7 +168,7 @@ jobs:
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: ./gradlew publishAllPublicationsToSonatypeSnapshotsRepository -PciVersion="$RELEASE_VERSION"
+        run: ./gradlew publishAllPublicationsToSonatypeSnapshotsRepository -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Create GitHub release
         if: github.ref_type == 'tag' && env.IS_SNAPSHOT == 'false' && env.DRY_RUN != 'true'
         uses: softprops/action-gh-release@v3

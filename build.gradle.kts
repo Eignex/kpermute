@@ -31,15 +31,24 @@ tasks.withType<org.gradle.api.tasks.testing.AbstractTestTask>().configureEach {
     inputs.property("kotlin.tests.individualTaskReports", providers.gradleProperty("kotlin.tests.individualTaskReports"))
 }
 
-@OptIn(ExperimentalWasmDsl::class)
+// Routine checks cover JVM + Linux x64; release validation opts into every target.
+val fullTargets = providers.gradleProperty("targets.full").isPresent
+
+@OptIn(ExperimentalWasmDsl::class, org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
 kotlin {
+    abiValidation {
+        referenceDumpDir.set(layout.projectDirectory.dir(if (fullTargets) "api-full" else "api"))
+    }
     jvm()
-    js { browser(); nodejs() }
-    wasmJs { browser(); nodejs() }
-    wasmWasi { nodejs() }
-    linuxX64(); linuxArm64()
-    macosArm64(); mingwX64()
-    iosX64(); iosArm64(); iosSimulatorArm64()
+    linuxX64()
+    if (fullTargets) {
+        js { browser(); nodejs() }
+        wasmJs { browser(); nodejs() }
+        wasmWasi { nodejs() }
+        linuxArm64()
+        macosArm64(); mingwX64()
+        iosX64(); iosArm64(); iosSimulatorArm64()
+    }
 }
 
 dokka {

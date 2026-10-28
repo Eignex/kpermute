@@ -1,0 +1,120 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxArm64, linuxX64, macosArm64, mingwX64, wasmJs, wasmWasi]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <com.eignex:kpermute>
+abstract interface com.eignex.kpermute/IntPermutation : kotlin.collections/Iterable<kotlin/Int> { // com.eignex.kpermute/IntPermutation|null[0]
+    abstract val size // com.eignex.kpermute/IntPermutation.size|{}size[0]
+        abstract fun <get-size>(): kotlin/Int // com.eignex.kpermute/IntPermutation.size.<get-size>|<get-size>(){}[0]
+
+    abstract fun decodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/IntPermutation.decodeUnchecked|decodeUnchecked(kotlin.Int){}[0]
+    abstract fun encodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/IntPermutation.encodeUnchecked|encodeUnchecked(kotlin.Int){}[0]
+    abstract fun iterator(kotlin/Int): kotlin.collections/IntIterator // com.eignex.kpermute/IntPermutation.iterator|iterator(kotlin.Int){}[0]
+    open fun decode(kotlin/Int): kotlin/Int // com.eignex.kpermute/IntPermutation.decode|decode(kotlin.Int){}[0]
+    open fun encode(kotlin/Int): kotlin/Int // com.eignex.kpermute/IntPermutation.encode|encode(kotlin.Int){}[0]
+    open fun iterator(): kotlin.collections/IntIterator // com.eignex.kpermute/IntPermutation.iterator|iterator(){}[0]
+}
+
+abstract interface com.eignex.kpermute/LongPermutation : kotlin.collections/Iterable<kotlin/Long> { // com.eignex.kpermute/LongPermutation|null[0]
+    abstract val size // com.eignex.kpermute/LongPermutation.size|{}size[0]
+        abstract fun <get-size>(): kotlin/Long // com.eignex.kpermute/LongPermutation.size.<get-size>|<get-size>(){}[0]
+
+    abstract fun decodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/LongPermutation.decodeUnchecked|decodeUnchecked(kotlin.Long){}[0]
+    abstract fun encodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/LongPermutation.encodeUnchecked|encodeUnchecked(kotlin.Long){}[0]
+    abstract fun iterator(kotlin/Long): kotlin.collections/LongIterator // com.eignex.kpermute/LongPermutation.iterator|iterator(kotlin.Long){}[0]
+    open fun decode(kotlin/Long): kotlin/Long // com.eignex.kpermute/LongPermutation.decode|decode(kotlin.Long){}[0]
+    open fun encode(kotlin/Long): kotlin/Long // com.eignex.kpermute/LongPermutation.encode|encode(kotlin.Long){}[0]
+    open fun iterator(): kotlin.collections/LongIterator // com.eignex.kpermute/LongPermutation.iterator|iterator(){}[0]
+}
+
+final class com.eignex.kpermute/BoundedIntPermutation : com.eignex.kpermute/IntPermutation { // com.eignex.kpermute/BoundedIntPermutation|null[0]
+    constructor <init>(kotlin/Int, kotlin.random/Random = ..., kotlin/Int = ..., kotlin/UInt = ...) // com.eignex.kpermute/BoundedIntPermutation.<init>|<init>(kotlin.Int;kotlin.random.Random;kotlin.Int;kotlin.UInt){}[0]
+
+    final val size // com.eignex.kpermute/BoundedIntPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Int // com.eignex.kpermute/BoundedIntPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decode(kotlin/Int): kotlin/Int // com.eignex.kpermute/BoundedIntPermutation.decode|decode(kotlin.Int){}[0]
+    final fun decodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/BoundedIntPermutation.decodeUnchecked|decodeUnchecked(kotlin.Int){}[0]
+    final fun encode(kotlin/Int): kotlin/Int // com.eignex.kpermute/BoundedIntPermutation.encode|encode(kotlin.Int){}[0]
+    final fun encodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/BoundedIntPermutation.encodeUnchecked|encodeUnchecked(kotlin.Int){}[0]
+    final fun iterator(kotlin/Int): kotlin.collections/IntIterator // com.eignex.kpermute/BoundedIntPermutation.iterator|iterator(kotlin.Int){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/BoundedIntPermutation.toString|toString(){}[0]
+}
+
+final class com.eignex.kpermute/BoundedLongPermutation : com.eignex.kpermute/LongPermutation { // com.eignex.kpermute/BoundedLongPermutation|null[0]
+    constructor <init>(kotlin/Long, kotlin.random/Random = ..., kotlin/Int = ..., kotlin/ULong = ...) // com.eignex.kpermute/BoundedLongPermutation.<init>|<init>(kotlin.Long;kotlin.random.Random;kotlin.Int;kotlin.ULong){}[0]
+
+    final val size // com.eignex.kpermute/BoundedLongPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // com.eignex.kpermute/BoundedLongPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decode(kotlin/Long): kotlin/Long // com.eignex.kpermute/BoundedLongPermutation.decode|decode(kotlin.Long){}[0]
+    final fun decodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/BoundedLongPermutation.decodeUnchecked|decodeUnchecked(kotlin.Long){}[0]
+    final fun encode(kotlin/Long): kotlin/Long // com.eignex.kpermute/BoundedLongPermutation.encode|encode(kotlin.Long){}[0]
+    final fun encodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/BoundedLongPermutation.encodeUnchecked|encodeUnchecked(kotlin.Long){}[0]
+    final fun iterator(kotlin/Long): kotlin.collections/LongIterator // com.eignex.kpermute/BoundedLongPermutation.iterator|iterator(kotlin.Long){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/BoundedLongPermutation.toString|toString(){}[0]
+}
+
+final class com.eignex.kpermute/FullIntPermutation : com.eignex.kpermute/IntPermutation { // com.eignex.kpermute/FullIntPermutation|null[0]
+    constructor <init>(kotlin.random/Random = ..., kotlin/Int = ..., kotlin/Int = ..., kotlin/Int = ...) // com.eignex.kpermute/FullIntPermutation.<init>|<init>(kotlin.random.Random;kotlin.Int;kotlin.Int;kotlin.Int){}[0]
+
+    final val size // com.eignex.kpermute/FullIntPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Int // com.eignex.kpermute/FullIntPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/FullIntPermutation.decodeUnchecked|decodeUnchecked(kotlin.Int){}[0]
+    final fun encodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/FullIntPermutation.encodeUnchecked|encodeUnchecked(kotlin.Int){}[0]
+    final fun iterator(kotlin/Int): kotlin.collections/IntIterator // com.eignex.kpermute/FullIntPermutation.iterator|iterator(kotlin.Int){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/FullIntPermutation.toString|toString(){}[0]
+}
+
+final class com.eignex.kpermute/FullLongPermutation : com.eignex.kpermute/LongPermutation { // com.eignex.kpermute/FullLongPermutation|null[0]
+    constructor <init>(kotlin.random/Random = ..., kotlin/Int = ..., kotlin/Long = ..., kotlin/Long = ...) // com.eignex.kpermute/FullLongPermutation.<init>|<init>(kotlin.random.Random;kotlin.Int;kotlin.Long;kotlin.Long){}[0]
+
+    final val size // com.eignex.kpermute/FullLongPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // com.eignex.kpermute/FullLongPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/FullLongPermutation.decodeUnchecked|decodeUnchecked(kotlin.Long){}[0]
+    final fun encodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/FullLongPermutation.encodeUnchecked|encodeUnchecked(kotlin.Long){}[0]
+    final fun iterator(kotlin/Long): kotlin.collections/LongIterator // com.eignex.kpermute/FullLongPermutation.iterator|iterator(kotlin.Long){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/FullLongPermutation.toString|toString(){}[0]
+}
+
+final class com.eignex.kpermute/SmallIntPermutation : com.eignex.kpermute/IntPermutation { // com.eignex.kpermute/SmallIntPermutation|null[0]
+    constructor <init>(kotlin/Int, kotlin.random/Random) // com.eignex.kpermute/SmallIntPermutation.<init>|<init>(kotlin.Int;kotlin.random.Random){}[0]
+
+    final val size // com.eignex.kpermute/SmallIntPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Int // com.eignex.kpermute/SmallIntPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/SmallIntPermutation.decodeUnchecked|decodeUnchecked(kotlin.Int){}[0]
+    final fun encodeUnchecked(kotlin/Int): kotlin/Int // com.eignex.kpermute/SmallIntPermutation.encodeUnchecked|encodeUnchecked(kotlin.Int){}[0]
+    final fun iterator(kotlin/Int): kotlin.collections/IntIterator // com.eignex.kpermute/SmallIntPermutation.iterator|iterator(kotlin.Int){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/SmallIntPermutation.toString|toString(){}[0]
+}
+
+final class com.eignex.kpermute/SmallLongPermutation : com.eignex.kpermute/LongPermutation { // com.eignex.kpermute/SmallLongPermutation|null[0]
+    constructor <init>(kotlin/Long, kotlin.random/Random) // com.eignex.kpermute/SmallLongPermutation.<init>|<init>(kotlin.Long;kotlin.random.Random){}[0]
+
+    final val size // com.eignex.kpermute/SmallLongPermutation.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // com.eignex.kpermute/SmallLongPermutation.size.<get-size>|<get-size>(){}[0]
+
+    final fun decodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/SmallLongPermutation.decodeUnchecked|decodeUnchecked(kotlin.Long){}[0]
+    final fun encodeUnchecked(kotlin/Long): kotlin/Long // com.eignex.kpermute/SmallLongPermutation.encodeUnchecked|encodeUnchecked(kotlin.Long){}[0]
+    final fun iterator(kotlin/Long): kotlin.collections/LongIterator // com.eignex.kpermute/SmallLongPermutation.iterator|iterator(kotlin.Long){}[0]
+    final fun toString(): kotlin/String // com.eignex.kpermute/SmallLongPermutation.toString|toString(){}[0]
+}
+
+final fun (com.eignex.kpermute/IntPermutation).com.eignex.kpermute/range(kotlin.ranges/IntRange): com.eignex.kpermute/IntPermutation // com.eignex.kpermute/range|range@com.eignex.kpermute.IntPermutation(kotlin.ranges.IntRange){}[0]
+final fun (com.eignex.kpermute/LongPermutation).com.eignex.kpermute/range(kotlin.ranges/LongRange): com.eignex.kpermute/LongPermutation // com.eignex.kpermute/range|range@com.eignex.kpermute.LongPermutation(kotlin.ranges.LongRange){}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/List<#A>).com.eignex.kpermute/permuted(com.eignex.kpermute/IntPermutation = ...): kotlin.collections/List<#A> // com.eignex.kpermute/permuted|permuted@kotlin.collections.List<0:0>(com.eignex.kpermute.IntPermutation){0§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/List<#A>).com.eignex.kpermute/unpermuted(com.eignex.kpermute/IntPermutation): kotlin.collections/List<#A> // com.eignex.kpermute/unpermuted|unpermuted@kotlin.collections.List<0:0>(com.eignex.kpermute.IntPermutation){0§<kotlin.Any?>}[0]
+final fun com.eignex.kpermute/intPermutation(kotlin.ranges/IntRange, kotlin.random/Random = ..., kotlin/Int = ...): com.eignex.kpermute/IntPermutation // com.eignex.kpermute/intPermutation|intPermutation(kotlin.ranges.IntRange;kotlin.random.Random;kotlin.Int){}[0]
+final fun com.eignex.kpermute/intPermutation(kotlin.ranges/IntRange, kotlin/Long, kotlin/Int = ...): com.eignex.kpermute/IntPermutation // com.eignex.kpermute/intPermutation|intPermutation(kotlin.ranges.IntRange;kotlin.Long;kotlin.Int){}[0]
+final fun com.eignex.kpermute/intPermutation(kotlin/Int = ..., kotlin.random/Random = ..., kotlin/Int = ...): com.eignex.kpermute/IntPermutation // com.eignex.kpermute/intPermutation|intPermutation(kotlin.Int;kotlin.random.Random;kotlin.Int){}[0]
+final fun com.eignex.kpermute/intPermutation(kotlin/Int = ..., kotlin/Long, kotlin/Int = ...): com.eignex.kpermute/IntPermutation // com.eignex.kpermute/intPermutation|intPermutation(kotlin.Int;kotlin.Long;kotlin.Int){}[0]
+final fun com.eignex.kpermute/longPermutation(kotlin.ranges/LongRange, kotlin.random/Random = ..., kotlin/Int = ...): com.eignex.kpermute/LongPermutation // com.eignex.kpermute/longPermutation|longPermutation(kotlin.ranges.LongRange;kotlin.random.Random;kotlin.Int){}[0]
+final fun com.eignex.kpermute/longPermutation(kotlin.ranges/LongRange, kotlin/Long, kotlin/Int = ...): com.eignex.kpermute/LongPermutation // com.eignex.kpermute/longPermutation|longPermutation(kotlin.ranges.LongRange;kotlin.Long;kotlin.Int){}[0]
+final fun com.eignex.kpermute/longPermutation(kotlin/Long = ..., kotlin.random/Random = ..., kotlin/Int = ...): com.eignex.kpermute/LongPermutation // com.eignex.kpermute/longPermutation|longPermutation(kotlin.Long;kotlin.random.Random;kotlin.Int){}[0]
+final fun com.eignex.kpermute/longPermutation(kotlin/Long = ..., kotlin/Long, kotlin/Int = ...): com.eignex.kpermute/LongPermutation // com.eignex.kpermute/longPermutation|longPermutation(kotlin.Long;kotlin.Long;kotlin.Int){}[0]

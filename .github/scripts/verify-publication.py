@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 """Verify the complete staged KMP publication before independent consumer resolution."""
 
+import argparse
 import hashlib
 import json
-import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from zipfile import ZipFile
 
 
-def verify(repository, version):
+def verify(repository, version, full=False):
     base = Path(repository).resolve() / "com/eignex"
-    modules = ["kpermute"] + ["kpermute-" + target for target in (
-        "jvm", "js", "wasm-js", "wasm-wasi", "linuxx64", "linuxarm64", "macosarm64",
-        "mingwx64", "iosx64", "iosarm64", "iossimulatorarm64",
-    )]
+    targets = ["jvm", "linuxx64"]
+    if full:
+        targets += ["js", "wasm-js", "wasm-wasi", "linuxarm64", "macosarm64", "mingwx64", "iosx64", "iosarm64", "iossimulatorarm64"]
+    modules = ["kpermute"] + ["kpermute-" + target for target in targets]
     for module in modules:
         directory = base / module / version
         stem = f"{module}-{version}"
@@ -22,6 +22,10 @@ def verify(repository, version):
         pom = directory / f"{stem}.pom"
         data = json.loads(metadata.read_text())
         ET.parse(pom)
+        if module == "kpermute":
+            published = {variant["available-at"]["module"] for variant in data["variants"] if "available-at" in variant}
+            if published != set(modules[1:]):
+                raise ValueError(f"Publication targets do not match the requested profile: {sorted(published)}")
         if "kbuild-platform" in metadata.read_text() or "kbuild-platform" in pom.read_text():
             raise ValueError(f"Build platform leaked into {module}")
         for variant in data["variants"]:
@@ -55,6 +59,9 @@ def verify(repository, version):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        sys.exit("usage: verify-publication.py REPOSITORY VERSION")
-    verify(*sys.argv[1:])
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("repository")
+    parser.add_argument("version")
+    parser.add_argument("--full", action="store_true", help="Require the complete release target set")
+    args = parser.parse_args()
+    verify(args.repository, args.version, args.full)
