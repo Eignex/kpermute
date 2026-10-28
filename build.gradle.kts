@@ -21,7 +21,6 @@ eignexPublish {
     githubRepo.set("Eignex/kpermute")
 }
 
-
 @OptIn(ExperimentalWasmDsl::class)
 kotlin {
     jvm()
