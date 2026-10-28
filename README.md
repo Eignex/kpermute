@@ -22,7 +22,7 @@ cryptographic.
 ### Installation
 
 ```kotlin
-implementation("com.eignex:kpermute:1.2.0")
+implementation("com.eignex:kpermute:1.3.0")
 ```
 
 ## Usage
