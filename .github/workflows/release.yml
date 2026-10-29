@@ -7,28 +7,14 @@ on:
     branches: [main]
   push:
     tags: ['v*']
-  workflow_dispatch:
-    inputs:
-      testRelease:
-        description: Publish the next SemVer RC to GitHub only after full validation
-        type: boolean
-        default: false
-      rcBaseVersion:
-        description: RC base version, e.g. 1.4.0 (blank means next patch)
-        type: string
-        default: ''
-      dryRun:
-        description: Run the release build and publish nothing
-        type: boolean
-        default: false
 
 permissions:
   contents: read
 
-# Serialize manual RC allocation; newer snapshots may supersede older runs.
+# New snapshots supersede older runs; a tag publication must never be cancelled.
 concurrency:
-  group: release-${{ inputs.testRelease && 'test-release' || github.ref }}
-  cancel-in-progress: ${{ github.ref_type != 'tag' && inputs.testRelease != true }}
+  group: release-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   prepare:
@@ -46,7 +32,6 @@ jobs:
       is_prerelease: ${{ steps.version.outputs.is_prerelease }}
       test_release: ${{ steps.version.outputs.test_release }}
       release_tag: ${{ steps.version.outputs.release_tag }}
-      dry_run: ${{ steps.version.outputs.dry_run }}
       revision: ${{ steps.version.outputs.revision }}
     steps:
       - name: Checkout
@@ -57,10 +42,6 @@ jobs:
           fetch-depth: 0
       - name: Resolve publication version
         id: version
-        env:
-          DRY_RUN: ${{ inputs.dryRun || false }}
-          TEST_RELEASE: ${{ inputs.testRelease || false }}
-          RC_BASE_VERSION: ${{ inputs.rcBaseVersion || '' }}
         run: python3 .github/scripts/release-version.py
 
   # Releases rerun Linux checks at the release version alongside macOS/iOS and Windows.
@@ -92,8 +73,6 @@ jobs:
       IS_SNAPSHOT: ${{ needs.prepare.outputs.is_snapshot }}
       IS_TEST_RELEASE: ${{ needs.prepare.outputs.test_release }}
       RELEASE_TAG: ${{ needs.prepare.outputs.release_tag }}
-      RELEASE_REVISION: ${{ needs.prepare.outputs.revision }}
-      DRY_RUN: ${{ needs.prepare.outputs.dry_run }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -128,27 +107,18 @@ jobs:
           name: kpermute-test-release-assets
           path: build/github-release-assets/
           if-no-files-found: error
-      - name: Create RC tag at the validated revision
-        if: env.IS_TEST_RELEASE == 'true' && env.DRY_RUN != 'true' && github.ref_type != 'tag'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # A retry may reuse its own tag, but must never move an existing tag.
-          gh api "repos/$GITHUB_REPOSITORY/git/refs" --method POST \
-            -f "ref=refs/tags/$RELEASE_TAG" -f "sha=$RELEASE_REVISION" > /dev/null || \
-            test "$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG" --jq '.object.sha')" = "$RELEASE_REVISION"
       - name: Publish RC to GitHub only
-        if: env.IS_TEST_RELEASE == 'true' && env.DRY_RUN != 'true'
+        if: env.IS_TEST_RELEASE == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: ./gradlew publishToGitHubRelease -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Verify anonymous consumer from GitHub
-        if: env.IS_TEST_RELEASE == 'true' && env.DRY_RUN != 'true'
+        if: env.IS_TEST_RELEASE == 'true'
         run: >-
           ./gradlew -p consumer run -Pconsumer.version="$RELEASE_VERSION"
           -Pconsumer.githubRepository="https://github.com/$GITHUB_REPOSITORY/releases/download/$RELEASE_TAG"
       - name: Publish to Maven Central (Portal)
-        if: env.IS_SNAPSHOT == 'false' && env.IS_TEST_RELEASE != 'true' && env.DRY_RUN != 'true'
+        if: env.IS_SNAPSHOT == 'false' && env.IS_TEST_RELEASE != 'true'
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
@@ -156,7 +126,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
         run: ./gradlew publishToMavenCentral -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Publish to Sonatype Snapshots
-        if: env.IS_SNAPSHOT == 'true' && env.DRY_RUN != 'true'
+        if: env.IS_SNAPSHOT == 'true'
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.CENTRAL_PORTAL_USER }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.CENTRAL_PORTAL_PASSWORD }}
@@ -164,7 +134,7 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
         run: ./gradlew publishAllPublicationsToSonatypeSnapshotsRepository -Ptargets.full -PciVersion="$RELEASE_VERSION"
       - name: Create GitHub release
-        if: github.ref_type == 'tag' && env.IS_SNAPSHOT == 'false' && env.IS_TEST_RELEASE != 'true' && env.DRY_RUN != 'true'
+        if: github.ref_type == 'tag' && env.IS_SNAPSHOT == 'false' && env.IS_TEST_RELEASE != 'true'
         uses: softprops/action-gh-release@v3
         with:
           prerelease: ${{ needs.prepare.outputs.is_prerelease }}

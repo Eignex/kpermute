@@ -90,9 +90,9 @@ run the packaged JAR on Java 17 and 25. CI stages the configured publications,
 checks their metadata and artifacts, and runs an independent Java consumer using
 both Gradle metadata and POM-only resolution.
 
-Normal pull-request and main builds use one Linux job. Tagged releases and release
-dry runs enable `-Ptargets.full`, with focused macOS ARM64, iOS simulator and Windows
-checks. The build workflow's manual `fullTargets` input enables the same full gate.
+Normal pull-request and main builds use one Linux job. Tagged stable and RC releases
+enable `-Ptargets.full`, with focused macOS ARM64, iOS simulator and Windows checks.
+The build workflow's manual `fullTargets` input runs the same gate without publishing.
 Automatic snapshots publish all targets without repeating the full runtime gate.
 Releases rerun the full Linux gate at the actual release version, in parallel with
 the macOS/iOS and Windows jobs. Publication waits for every platform to pass and
@@ -110,24 +110,21 @@ only when the encryption secret is available. The local CI publication uses a
 stable version so source-only commits can reuse configuration state; the consumer
 always refreshes that local module, while external dependencies remain cached.
 
-### Test releases on GitHub
+### Tagged releases
 
-Run the release workflow with `testRelease=true` to build and test the same full
-release target set, then publish a GitHub prerelease with all publication assets
-and `SHA256SUMS`. Test releases never upload to Maven Central or Sonatype Snapshots.
+Push an explicit SemVer RC tag to run the full parallel release gate and publish
+all 12 publications with `SHA256SUMS` to a GitHub prerelease:
 
 ```sh
-gh workflow run release.yml --ref main -f testRelease=true
+git tag v1.3.1-rc.1
+git push origin v1.3.1-rc.1
 ```
 
-The version defaults to the next patch after the latest stable tag, with an
-incrementing SemVer suffix: `v1.3.1-rc.1`, `v1.3.1-rc.2`, and so on. Set
-`rcBaseVersion` (for example `1.4.0`) to choose a different upcoming version.
-The RC tag is created at the validated commit only after every platform passes.
-Pushing an explicit `vX.Y.Z-rc.N` tag also selects GitHub-only publication.
+The version comes directly from the tag. Release workflows never create tags or
+increment RC numbers. RCs publish to GitHub only; stable tags such as `v1.3.1`
+publish to Maven Central and create a GitHub release after validation.
+There is no manual release dispatch.
 
-Add `-f dryRun=true` to exercise RC packaging and consumer checks without creating
-a tag or release; validated assets remain available as a workflow artifact.
-GitHub assets include JVM/native/web artifacts, sources, documentation and Gradle
-metadata. They can be consumed anonymously using the flat Ivy repository pattern
-in [the independent consumer](consumer/settings.gradle.kts).
+GitHub RC assets include JVM/native/web artifacts, sources, documentation and
+Gradle metadata. They can be consumed anonymously using the flat Ivy repository
+pattern in [the independent consumer](consumer/settings.gradle.kts).
