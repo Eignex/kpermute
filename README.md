@@ -109,3 +109,25 @@ Gradle-encrypted configuration state separately. Configuration state is persiste
 only when the encryption secret is available. The local CI publication uses a
 stable version so source-only commits can reuse configuration state; the consumer
 always refreshes that local module, while external dependencies remain cached.
+
+### Test releases on GitHub
+
+Run the release workflow with `testRelease=true` to build and test the same full
+release target set, then publish a GitHub prerelease with all publication assets
+and `SHA256SUMS`. Test releases never upload to Maven Central or Sonatype Snapshots.
+
+```sh
+gh workflow run release.yml --ref main -f testRelease=true
+```
+
+The version defaults to the next patch after the latest stable tag, with an
+incrementing SemVer suffix: `v1.3.1-rc.1`, `v1.3.1-rc.2`, and so on. Set
+`rcBaseVersion` (for example `1.4.0`) to choose a different upcoming version.
+The RC tag is created at the validated commit only after every platform passes.
+Pushing an explicit `vX.Y.Z-rc.N` tag also selects GitHub-only publication.
+
+Add `-f dryRun=true` to exercise RC packaging and consumer checks without creating
+a tag or release; validated assets remain available as a workflow artifact.
+GitHub assets include JVM/native/web artifacts, sources, documentation and Gradle
+metadata. They can be consumed anonymously using the flat Ivy repository pattern
+in [the independent consumer](consumer/settings.gradle.kts).

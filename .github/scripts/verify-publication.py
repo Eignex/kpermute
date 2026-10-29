@@ -9,14 +9,15 @@ from pathlib import Path
 from zipfile import ZipFile
 
 
-def verify(repository, version, full=False):
-    base = Path(repository).resolve() / "com/eignex"
+def verify(repository, version, full=False, github=False):
+    repository = Path(repository).resolve()
+    base = repository if github else repository / "com/eignex"
     targets = ["jvm", "linuxx64"]
     if full:
         targets += ["js", "wasm-js", "wasm-wasi", "linuxarm64", "macosarm64", "mingwx64", "iosx64", "iosarm64", "iossimulatorarm64"]
     modules = ["kpermute"] + ["kpermute-" + target for target in targets]
     for module in modules:
-        directory = base / module / version
+        directory = base if github else base / module / version
         stem = f"{module}-{version}"
         metadata = directory / f"{stem}.module"
         pom = directory / f"{stem}.pom"
@@ -55,6 +56,14 @@ def verify(repository, version, full=False):
                 for name in archive.namelist():
                     if name.endswith(".class") and int.from_bytes(archive.read(name)[6:8], "big") > 61:
                         raise ValueError(f"Bytecode above Java 17: {name}")
+    if github:
+        checksums = dict(line.split("  ", 1)[::-1] for line in (base / "SHA256SUMS").read_text().splitlines())
+        files = {path.name for path in base.iterdir() if path.is_file() and path.name != "SHA256SUMS"}
+        if set(checksums) != files:
+            raise ValueError("GitHub checksum manifest does not cover every release asset")
+        for name, digest in checksums.items():
+            if hashlib.sha256((base / name).read_bytes()).hexdigest() != digest:
+                raise ValueError(f"GitHub asset checksum mismatch: {name}")
     print(f"Verified {len(modules)} complete publications at {version}")
 
 
@@ -63,5 +72,6 @@ if __name__ == "__main__":
     parser.add_argument("repository")
     parser.add_argument("version")
     parser.add_argument("--full", action="store_true", help="Require the complete release target set")
+    parser.add_argument("--github", action="store_true", help="Verify flat GitHub Release assets and their checksum manifest")
     args = parser.parse_args()
-    verify(args.repository, args.version, args.full)
+    verify(args.repository, args.version, args.full, args.github)

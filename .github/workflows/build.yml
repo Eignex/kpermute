@@ -56,8 +56,10 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           target-profile: ${{ inputs.fullTargets && 'full' || 'default' }}
 
-      - name: Validate the test report guard
-        run: python3 .github/scripts/test-verification.py
+      - name: Validate CI guards
+        run: |
+          python3 .github/scripts/test-verification.py
+          python3 .github/scripts/test-release-version.py
 
       # Routine builds use a stable private version for configuration-cache reuse.
       # Releases rerun this gate at their actual publication version.

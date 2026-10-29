@@ -6,10 +6,19 @@ dependencyResolutionManagement {
     repositories {
         exclusiveContent {
             forRepository {
-                maven {
-                    url = uri(providers.gradleProperty("consumer.repository").get())
-                    if (providers.gradleProperty("consumer.pomOnly").getOrElse("false").toBoolean()) {
-                        metadataSources { mavenPom(); artifact(); ignoreGradleMetadataRedirection() }
+                val githubRepository = providers.gradleProperty("consumer.githubRepository")
+                if (githubRepository.isPresent) {
+                    ivy {
+                        url = uri(githubRepository.get())
+                        patternLayout { artifact("[artifact]-[revision](-[classifier]).[ext]") }
+                        metadataSources { gradleMetadata() }
+                    }
+                } else {
+                    maven {
+                        url = uri(providers.gradleProperty("consumer.repository").get())
+                        if (providers.gradleProperty("consumer.pomOnly").getOrElse("false").toBoolean()) {
+                            metadataSources { mavenPom(); artifact(); ignoreGradleMetadataRedirection() }
+                        }
                     }
                 }
             }
