@@ -15,6 +15,10 @@ on:
       ref:
         type: string
         default: ''
+      ciVersion:
+        description: Version to stage and verify; releases use their actual version
+        type: string
+        default: '0.0.0-ci'
       fullTargets:
         type: boolean
         default: false
@@ -55,12 +59,13 @@ jobs:
       - name: Validate the test report guard
         run: python3 .github/scripts/test-verification.py
 
-      # A stable private staging version preserves configuration-cache reuse across commits.
+      # Routine builds use a stable private version for configuration-cache reuse.
+      # Releases rerun this gate at their actual publication version.
       # The independent consumer treats only this local artifact as changing.
       # One graph shares compilation, lint, docs and publication artifacts.
       - name: Check library and stage publications
         env:
-          CONSUMER_VERSION: 0.0.0-ci
+          CONSUMER_VERSION: ${{ inputs.ciVersion || '0.0.0-ci' }}
           FULL_TARGETS: ${{ inputs.fullTargets || false }}
         run: |
           target_args=()
@@ -83,7 +88,7 @@ jobs:
 
       - name: Verify staged publications and independent consumers
         env:
-          CONSUMER_VERSION: 0.0.0-ci
+          CONSUMER_VERSION: ${{ inputs.ciVersion || '0.0.0-ci' }}
           FULL_TARGETS: ${{ inputs.fullTargets || false }}
         run: |
           target_args=()

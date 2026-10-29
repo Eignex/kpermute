@@ -86,13 +86,15 @@ jobs:
             echo "revision=$(git rev-parse HEAD)"
           } >> "$GITHUB_OUTPUT"
 
-  # Tags and manual releases require the full gate; snapshots reuse the normal main build.
+  # Releases rerun Linux checks at the release version alongside macOS/iOS and Windows.
+  # Publication waits for every platform. Snapshots reuse the normal main build.
   validate:
     if: github.event_name != 'workflow_run'
     needs: prepare
     uses: ./.github/workflows/build.yml
     with:
       ref: ${{ needs.prepare.outputs.revision }}
+      ciVersion: ${{ needs.prepare.outputs.version }}
       fullTargets: true
     secrets:
       GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -126,7 +128,7 @@ jobs:
           target-profile: full
 
       # The reusable validation job already ran the full checks and uploaded test reports.
-      # Stage again only to verify metadata and consumer resolution at the actual release version.
+      # Recheck the publication job's staged artifacts and consumer resolution before publishing.
       - name: Verify release publication
         if: env.IS_SNAPSHOT == 'false'
         run: |
