@@ -4,6 +4,9 @@ inputs:
   cache-encryption-key:
     description: Encryption key for the Gradle configuration cache
     required: false
+  gradle-cache-read-only:
+    description: Restore Gradle User Home without saving publication-job state
+    default: 'false'
   target-profile:
     description: Separate cached Native and configuration state for normal and full targets
     default: default
@@ -18,7 +21,7 @@ runs:
           25
     - uses: gradle/actions/setup-gradle@v6
       with:
-        cache-read-only: false
+        cache-read-only: ${{ inputs.gradle-cache-read-only }}
         cache-encryption-key: ${{ inputs.cache-encryption-key }}
     - uses: actions/cache@v6
       with:

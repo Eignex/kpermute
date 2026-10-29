@@ -86,7 +86,7 @@ jobs:
             echo "revision=$(git rev-parse HEAD)"
           } >> "$GITHUB_OUTPUT"
 
-  # Automatic snapshots already passed this gate.
+  # Tags and manual releases require the full gate; snapshots reuse the normal main build.
   validate:
     if: github.event_name != 'workflow_run'
     needs: prepare
@@ -118,43 +118,21 @@ jobs:
         with:
           ref: ${{ needs.prepare.outputs.revision }}
           persist-credentials: false
-      - name: Set up JDK
-        uses: actions/setup-java@v6
+      - name: Set up build
+        uses: ./.github/actions/setup-build
         with:
-          distribution: temurin
-          java-version: 25
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-read-only: true
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-      - name: Restore Kotlin/Native toolchain
-        uses: actions/cache/restore@v6
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-${{ runner.arch }}-konan-full-${{ hashFiles('build.gradle.kts', 'settings.gradle.kts', 'gradle.properties', 'gradle/wrapper/gradle-wrapper.properties', 'gradle/*.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-konan-full-
-            ${{ runner.os }}-${{ runner.arch }}-konan-
+          gradle-cache-read-only: 'true'
+          target-profile: full
 
-      - name: Build and Test
-        if: env.IS_SNAPSHOT == 'false'
-        run: ./gradlew build -Ptargets.full -PciVersion="$RELEASE_VERSION"
+      # The reusable validation job already ran the full checks and uploaded test reports.
+      # Stage again only to verify metadata and consumer resolution at the actual release version.
       - name: Verify release publication
         if: env.IS_SNAPSHOT == 'false'
         run: |
           ./gradlew publishAllPublicationsToLocalStagingRepository -Ptargets.full -PciVersion="$RELEASE_VERSION"
           python3 .github/scripts/verify-publication.py build/staging-repo "$RELEASE_VERSION" --full
           bash .github/scripts/verify-consumer.sh "$RELEASE_VERSION"
-      - name: Upload test reports
-        if: always() && env.IS_SNAPSHOT == 'false'
-        uses: actions/upload-artifact@v7
-        with:
-          name: release-test-reports
-          path: |
-            **/build/reports/tests/
-            **/build/test-results/
-          if-no-files-found: ignore
       - name: Publish to Maven Central (Portal)
         if: env.IS_SNAPSHOT == 'false' && env.DRY_RUN != 'true'
         env:

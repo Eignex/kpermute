@@ -94,6 +94,8 @@ Normal pull-request and main builds use one Linux job. Tagged releases and relea
 dry runs enable `-Ptargets.full`, with focused macOS ARM64, iOS simulator and Windows
 checks. The build workflow's manual `fullTargets` input enables the same full gate.
 Automatic snapshots publish all targets without repeating the full runtime gate.
+Release publication reuses the completed full validation, then checks staged artifacts
+and independent consumers at the actual release version without repeating the test suite.
 
 ABI references live in `api/` for normal checks and `api-full/` for full checks.
 When intentionally updating the API, run `./gradlew updateKotlinAbi` and
